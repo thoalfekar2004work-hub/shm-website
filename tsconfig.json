@@ -6,5 +6,5 @@
     "allowJs": true
   },
   "include": [".astro/types.d.ts", "src/**/*", "scripts/**/*"],
-  "exclude": ["dist", "node_modules", "functions"]
+  "exclude": ["dist", "node_modules", "functions", "src/worker.ts"]
 }

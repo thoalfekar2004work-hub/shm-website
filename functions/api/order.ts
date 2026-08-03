@@ -12,7 +12,12 @@
 import productsData from '../../src/data/products.json';
 import { validateOrder, DELIVERY_FEE_IQD } from '../../src/lib/order-shared';
 
-interface Env {
+/**
+ * Exported so src/worker.ts (the real production entry point — see its
+ * top-of-file comment for why this file alone isn't enough) can share the
+ * same environment shape.
+ */
+export interface Env {
   TELEGRAM_BOT_TOKEN: string;
   TELEGRAM_CHAT_ID: string;
   NOTION_TOKEN?: string;
@@ -52,7 +57,7 @@ function baghdadTimestamp(now: Date): string {
   );
 }
 
-const handlePost: PagesFunction<Env> = async ({ request, env }) => {
+async function handleOrder(request: Request, env: Env): Promise<Response> {
   let raw: unknown;
   try {
     raw = await request.json();
@@ -181,11 +186,16 @@ const handlePost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   return json({ ok: true, total });
-};
+}
 
-/** POST only — every other method is rejected outright. */
-export const onRequest: PagesFunction<Env> = async (context) => {
-  if (context.request.method !== 'POST') {
+/**
+ * POST only — every other method is rejected outright. Shared by both
+ * production entry points: the classic Pages Functions export below, and
+ * src/worker.ts's plain `fetch` handler (the one actually used in prod — see
+ * that file's top comment).
+ */
+export async function handleOrderRequest(request: Request, env: Env): Promise<Response> {
+  if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'method not allowed' }), {
       status: 405,
       headers: {
@@ -194,5 +204,11 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       },
     });
   }
-  return handlePost(context);
-};
+  return handleOrder(request, env);
+}
+
+/** Classic Pages Functions entry point — kept for `wrangler pages dev` and
+ *  in case this ever runs as a real git-connected Pages project. Production
+ *  right now is a Workers-with-assets project and uses src/worker.ts instead. */
+export const onRequest: PagesFunction<Env> = ({ request, env }) =>
+  handleOrderRequest(request, env);

@@ -1,0 +1,12 @@
+# This Cloudflare project is Workers-with-static-assets (its live URL is
+# *.workers.dev), not classic Pages — see src/worker.ts for why that matters.
+#
+# Build: `npm run build`  ·  static output: `dist`  ·  dynamic route: src/worker.ts
+name = "shm-website"
+main = "src/worker.ts"
+compatibility_date = "2026-07-01"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "404-page"

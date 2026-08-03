@@ -12,5 +12,5 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["**/*.ts", "../src/lib/order-shared.ts", "../src/data/*.json"]
+  "include": ["**/*.ts", "../src/worker.ts", "../src/lib/order-shared.ts", "../src/data/*.json"]
 }

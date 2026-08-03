@@ -36,19 +36,25 @@ Opens on <http://localhost:4321>. This is enough for anything visual.
 To test the **checkout endpoint** as well, you need the Workers runtime:
 
 ```bash
-npm run pages:dev
+npm run worker:dev
 ```
 
-That builds the site and serves it on <http://127.0.0.1:8788> with
-`functions/api/order.ts` live, reading secrets from `.dev.vars`.
+That builds the site and serves it on <http://127.0.0.1:8788> running
+**`src/worker.ts`** — the exact same entry point Cloudflare runs in
+production — reading secrets from `.dev.vars`. Use this one, not
+`pages:dev` (kept only for the unlikely case this ever becomes a real
+git-connected Pages project — see [Deploying](#deploying) for why that
+distinction matters here).
 
 Other commands:
 
 | Command | What it does |
 |---|---|
 | `npm run build` | Builds social preview images, builds the site, runs the origin-claim sweep |
+| `npm run worker:dev` | Builds and serves via `src/worker.ts` — mirrors production |
 | `npm run og` | Rebuilds only the social preview images |
 | `npm run check:banned` | Runs the origin-claim sweep on its own |
+| `npm run check:types` | Type-checks both the Astro site and the two Workers-runtime files |
 | `npm run ingest` | One-time re-import of the original photo folders (you will not normally need this) |
 
 ---
@@ -323,6 +329,25 @@ Notion error is written to the Cloudflare Pages logs
 
 ## Deploying
 
+**This project is a Workers-with-static-assets project, not classic Pages —
+even though it was created via Cloudflare's "Create → Pages → Connect to
+Git" flow.** Its live URL is a `*.workers.dev` domain, not `*.pages.dev`.
+Cloudflare has been merging the two platforms, and connecting a Git repo
+through that flow can now provision either kind depending on account/region —
+you get whichever one Cloudflare gives you, and the difference matters:
+
+- **Classic Pages** auto-detects a `functions/` directory and turns each file
+  into a route. No `wrangler.toml` needed for that.
+- **Workers-with-assets** has no idea what a `functions/` directory is. It
+  needs an explicit entry point.
+
+That entry point is **`src/worker.ts`** — it handles `/api/order` itself and
+hands every other request to the static-assets binding. `wrangler.toml`
+wires that up (`main` = the entry point, `[assets]` = the built `dist/`
+folder). Both files are already in the repo; you don't need to touch them
+unless Cloudflare's build log ever again shows something like *"Missing
+entry-point to Worker script"* — that error means this pairing broke.
+
 First time:
 
 1. Push this repo to GitHub.
@@ -331,15 +356,18 @@ First time:
 3. Build settings:
    - Build command: `npm run build`
    - Build output directory: `dist`
-   - `functions/` is detected automatically — nothing to configure.
-4. Add the four environment variables from section C above.
-5. Deploy. You get a `https://<project>.pages.dev` address.
+4. Add the four environment variables from section C above — for **both**
+   Production and Preview.
+5. Deploy. You'll get either a `https://<project>.pages.dev` or a
+   `https://<project>.<account>.workers.dev` address — check the deployment
+   log to see which; either way `npm run build` + `wrangler.toml` handle it.
 
 After that, every `git push` deploys automatically.
 
-When you buy a domain: Cloudflare Pages → your project → **Custom domains**.
-Then update `SITE_URL` in `src/i18n/strings.ts` and `site` in
-`astro.config.mjs` so link previews and the sitemap point at the real domain.
+When you buy a domain: your project → **Custom domains** (same place for
+either project type). Then update `SITE_URL` in `src/i18n/strings.ts` and
+`site` in `astro.config.mjs` so link previews and the sitemap point at the
+real domain.
 
 ### Before you tell anyone about the site
 
