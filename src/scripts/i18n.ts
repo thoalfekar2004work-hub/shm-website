@@ -1,5 +1,5 @@
 /**
- * Language toggle. Arabic is the served default; the choice persists in
+ * Language toggle. English is the served default; the choice persists in
  * localStorage and is applied to <html lang dir> before paint by the inline
  * bootstrap in Layout.astro, so there is no flash.
  */
@@ -9,7 +9,7 @@ const KEY = 'shm.lang';
 
 export function getLang(): Lang {
   const el = document.documentElement.getAttribute('lang');
-  return el === 'en' ? 'en' : 'ar';
+  return el === 'ar' ? 'ar' : 'en';
 }
 
 export function setLang(lang: Lang): void {

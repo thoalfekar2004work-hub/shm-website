@@ -5,7 +5,7 @@ import Footer from '../components/Footer.astro';
 import { SITE_URL } from '../i18n/strings';
 
 interface Props {
-  /** Arabic page title — Arabic is the served default. */
+  /** Arabic page title. English is the served default (see the <html> tag below). */
   titleAr: string;
   titleEn: string;
   descAr: string;
@@ -36,14 +36,14 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
 ---
 
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#111E34" />
 
-    <title data-page-title-ar={titleAr} data-page-title-en={titleEn}>{titleAr}</title>
-    <meta name="description" content={descAr} data-desc-ar={descAr} data-desc-en={descEn} />
+    <title data-page-title-ar={titleAr} data-page-title-en={titleEn}>{titleEn}</title>
+    <meta name="description" content={descEn} data-desc-ar={descAr} data-desc-en={descEn} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
 
@@ -56,9 +56,9 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="SHM" />
-    <meta property="og:locale" content="ar_IQ" />
-    <meta property="og:title" content={ogTitle ?? titleAr} />
-    <meta property="og:description" content={descAr} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:title" content={ogTitle ?? titleEn} />
+    <meta property="og:description" content={descEn} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
@@ -70,12 +70,20 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
 
     <script is:inline>
       // Apply the saved language before first paint so nothing flashes.
+      // English is the served default; only a saved "ar" choice switches it.
+      // Title/description are swapped here too, since they're SSR'd in
+      // English and otherwise wouldn't match a returning Arabic visitor
+      // until the in-page toggle script ran.
       (function () {
         try {
           var l = localStorage.getItem('shm.lang');
-          if (l === 'en') {
-            document.documentElement.setAttribute('lang', 'en');
-            document.documentElement.setAttribute('dir', 'ltr');
+          if (l === 'ar') {
+            document.documentElement.setAttribute('lang', 'ar');
+            document.documentElement.setAttribute('dir', 'rtl');
+            var titleEl = document.querySelector('title[data-page-title-ar]');
+            if (titleEl) document.title = titleEl.getAttribute('data-page-title-ar');
+            var descEl = document.querySelector('meta[name="description"][data-desc-ar]');
+            if (descEl) descEl.setAttribute('content', descEl.getAttribute('data-desc-ar'));
           }
         } catch (e) {}
       })();

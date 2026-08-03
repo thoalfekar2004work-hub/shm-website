@@ -13,7 +13,7 @@ import {
   bySlug,
   sets,
 } from '../lib/catalog';
-import { HERO_LINE_1, HERO_LINE_2, HERO_LINE_3_AR, formatPrice } from '../i18n/strings';
+import { HERO_LINE_1, HERO_LINE_2, HERO_LINE_1_AR, HERO_LINE_2_AR, formatPrice } from '../i18n/strings';
 
 const tiles = categories.map((c) => ({
   cat: c,
@@ -54,9 +54,14 @@ const HERO_PHOTOS = [
   <section class="hero">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <h1 class="h1 hero-en enter enter-1" lang="en" dir="ltr">{HERO_LINE_1}</h1>
-        <p class="h2 hero-en enter enter-2" lang="en" dir="ltr">{HERO_LINE_2}</p>
-        <p class="h3 hero-ar enter enter-3" lang="ar" dir="rtl">{HERO_LINE_3_AR}</p>
+        <div data-t="en">
+          <h1 class="h1 hero-en enter enter-1" lang="en" dir="ltr">{HERO_LINE_1}</h1>
+          <p class="h2 hero-en enter enter-2" lang="en" dir="ltr">{HERO_LINE_2}</p>
+        </div>
+        <div data-t="ar">
+          <h1 class="h1 hero-ar enter enter-1" lang="ar" dir="rtl">{HERO_LINE_1_AR}</h1>
+          <p class="h2 hero-ar enter enter-2" lang="ar" dir="rtl">{HERO_LINE_2_AR}</p>
+        </div>
         <a class="btn btn-primary hero-cta enter enter-4" href="#catalog"><T k="hero.cta" /></a>
       </div>
 
@@ -105,8 +110,8 @@ const HERO_PHOTOS = [
               />
             </div>
             <div class="meta">
-              <h2 class="name-ar" lang="ar" dir="rtl">{cat.name_ar}</h2>
-              <p class="name-en" lang="en" dir="ltr">{cat.name_en}</p>
+              <h2 class="name-ar" data-t="ar" lang="ar" dir="rtl">{cat.name_ar}</h2>
+              <p class="name-en" data-t="en" lang="en" dir="ltr">{cat.name_en}</p>
               <p class="from">
                 <T k="grid.from" />{' '}
                 <span class="price">
@@ -135,8 +140,8 @@ const HERO_PHOTOS = [
               />
             </div>
             <div class="meta">
-              <h2 class="name-ar" lang="ar" dir="rtl">الستات</h2>
-              <p class="name-en" lang="en" dir="ltr">Sets</p>
+              <h2 class="name-ar" data-t="ar" lang="ar" dir="rtl">الستات</h2>
+              <p class="name-en" data-t="en" lang="en" dir="ltr">Sets</p>
               <p class="from">
                 <T k="grid.from" />{' '}
                 <span class="price">
@@ -204,7 +209,6 @@ const HERO_PHOTOS = [
   }
 
   .h1 {
-    font-family: var(--font-en);
     font-size: var(--fs-3xl);
     line-height: 1.15;
     letter-spacing: -0.02em;
@@ -212,28 +216,16 @@ const HERO_PHOTOS = [
     text-align: start;
   }
 
-  /* The heading carries dir="ltr" for correct punctuation, so its own logical
-     margins resolve LTR too. Pin the box to the page's start side explicitly. */
-  :global(html[dir='rtl']) .h1 { margin-left: auto; margin-right: 0; }
-  :global(html[dir='ltr']) .h1 { margin-right: auto; margin-left: 0; }
-
   .h2 {
     margin-block-start: var(--s4);
-    font-family: var(--font-en);
     font-size: var(--fs-lg);
     color: var(--gray-500);
     font-weight: 400;
     text-align: start;
   }
 
-  .h3 {
-    margin-block-start: var(--s2);
-    font-family: var(--font-ar);
-    font-size: var(--fs-lg);
-    color: var(--gray-500);
-    font-weight: 400;
-    text-align: start;
-  }
+  .hero-en { font-family: var(--font-en); }
+  .hero-ar { font-family: var(--font-ar); }
 
   .hero-cta {
     margin-block-start: var(--s6);

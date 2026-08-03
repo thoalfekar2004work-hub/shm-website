@@ -6,16 +6,14 @@
 export type Lang = 'ar' | 'en';
 
 export const LANGS: Lang[] = ['ar', 'en'];
-export const DEFAULT_LANG: Lang = 'ar';
+export const DEFAULT_LANG: Lang = 'en';
 
-/** Brand statement — stays English in both language modes (spec §5). */
+/** Brand statement, shown only in English mode. */
 export const HERO_LINE_1 = 'SHM. Your Trusted Partner for Medical Instrument Selection.';
 export const HERO_LINE_2 = 'Powered by an Iraqi Medical Student.';
-/**
- * Arabic hero line. Defined as a single constant so deleting this one line
- * removes it cleanly from the hero if the owner decides against it (spec §5).
- */
-export const HERO_LINE_3_AR = 'شريكك الموثوق لاختيار أدواتك الجراحية.';
+/** Arabic equivalents, shown only in Arabic mode — one language at a time, never both. */
+export const HERO_LINE_1_AR = 'شريكك الموثوق لاختيار أدواتك الجراحية.';
+export const HERO_LINE_2_AR = 'بدعم من طالب طب عراقي.';
 
 export const WHATSAPP_NUMBER = '07858325208';
 export const WHATSAPP_INTL = '9647858325208';

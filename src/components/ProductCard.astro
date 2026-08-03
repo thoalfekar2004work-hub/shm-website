@@ -45,9 +45,8 @@ const onOffer = promoActive(product);
   </div>
 
   <div class="meta">
-    {/* Both languages always show on a tile, in both language modes (spec §6). */}
-    <h3 class="name-ar" lang="ar" dir="rtl">{product.name_ar}</h3>
-    <p class="name-en" lang="en" dir="ltr">{product.name_en}</p>
+    <h3 class="name-ar" data-t="ar" lang="ar" dir="rtl">{product.name_ar}</h3>
+    <p class="name-en" data-t="en" lang="en" dir="ltr">{product.name_en}</p>
     <p class="pricerow"><Price product={product} /></p>
   </div>
 </a>
