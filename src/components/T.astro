@@ -1,0 +1,21 @@
+---
+/**
+ * Renders one UI string in both languages; CSS shows the active one.
+ * Keeps the page usable with JS disabled and avoids a translation flash.
+ */
+import { t } from '../i18n/strings';
+
+interface Props {
+  k: string;
+  class?: string;
+}
+
+const { k, class: cls } = Astro.props;
+const entry = t[k];
+if (!entry) throw new Error(`Missing i18n key: ${k}`);
+---
+
+<span class={cls} data-t="ar" lang="ar">{entry.ar}</span><span
+  class={cls}
+  data-t="en"
+  lang="en">{entry.en}</span>

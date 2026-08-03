@@ -1,0 +1,351 @@
+---
+/**
+ * Scroll-sequenced product showcase.
+ *
+ * A pinned stage that advances through a fixed run of instruments as the
+ * customer scrolls: red iris → rainbow iris → needle holder. Each step is a
+ * sentinel of one screen height; an IntersectionObserver decides which panel
+ * is live, so there is no scroll handler doing layout maths on every frame.
+ *
+ * Without JS, or under prefers-reduced-motion, the panels simply stack and
+ * read as a normal list of three products.
+ */
+import { Image } from 'astro:assets';
+import { bySlug, heroFor, altFor, benefit } from '../lib/catalog';
+import { formatPrice, t } from '../i18n/strings';
+
+const SEQUENCE = ['iris-scissors-red-curved', 'iris-scissors-rainbow', 'needle-holder-halsey-tc-12-5cm'];
+
+const panels = SEQUENCE.map((slug) => {
+  const product = bySlug(slug);
+  if (!product) throw new Error(`[showcase] unknown product "${slug}"`);
+  return {
+    product,
+    hero: heroFor(slug),
+    benefitAr: benefit(product, 'ar'),
+    benefitEn: benefit(product, 'en'),
+  };
+});
+---
+
+<section class="showcase" id="showcase" aria-label="Featured instruments">
+  <div class="stage">
+    <div class="panels">
+      {panels.map(({ product: p, hero, benefitAr, benefitEn }, i) => (
+        <article class="panel" data-panel={i} data-active={i === 0 ? 'true' : 'false'}>
+          <a class="panel-shot" href={`/product/${p.slug}`} tabindex="-1" aria-hidden="true">
+            <Image
+              src={hero}
+              alt={altFor(p, hero, 0)}
+              width={900}
+              widths={[440, 660, 900]}
+              sizes="(min-width: 900px) 480px, 88vw"
+              loading={i === 0 ? 'eager' : 'lazy'}
+              format="webp"
+              quality={80}
+            />
+          </a>
+
+          <div class="panel-copy">
+            <p class="panel-index" dir="ltr" aria-hidden="true">
+              {String(i + 1).padStart(2, '0')} / {String(panels.length).padStart(2, '0')}
+            </p>
+            <h2 class="panel-name name-ar" lang="ar" dir="rtl">{p.name_ar}</h2>
+            <p class="panel-name-en name-en" lang="en" dir="ltr">{p.name_en}</p>
+            <p class="spec-line">{p.spec_line_en}</p>
+            {(benefitAr || benefitEn) && (
+              <p class="panel-benefit">
+                <span data-t="ar">{benefitAr}</span><span data-t="en">{benefitEn}</span>
+              </p>
+            )}
+            <p class="panel-price price">
+              <span data-t="ar">{formatPrice(p.price_iqd, 'ar')}</span><span data-t="en"
+                >{formatPrice(p.price_iqd, 'en')}</span>
+            </p>
+            <a class="btn btn-secondary panel-cta" href={`/product/${p.slug}`}>
+              <span data-t="ar">{t['product.addToCart'].ar}</span><span data-t="en"
+                >{t['product.addToCart'].en}</span>
+            </a>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <ol class="ticks" aria-hidden="true">
+      {panels.map((_, i) => <li data-tick={i} data-active={i === 0 ? 'true' : 'false'} />)}
+    </ol>
+  </div>
+
+  <div class="steps">
+    {panels.map((_, i) => <div class="step" data-step={i} />)}
+  </div>
+</section>
+
+<script>
+  const section = document.getElementById('showcase');
+  if (section) {
+    const panels = Array.from(section.querySelectorAll<HTMLElement>('.panel'));
+    const ticks = Array.from(section.querySelectorAll<HTMLElement>('[data-tick]'));
+    const steps = Array.from(section.querySelectorAll<HTMLElement>('.step'));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let active = -1;
+    const activate = (i: number) => {
+      if (i === active) return;
+      active = i;
+      panels.forEach((p, n) => p.setAttribute('data-active', String(n === i)));
+      ticks.forEach((tk, n) => tk.setAttribute('data-active', String(n === i)));
+    };
+
+    if (reduced.matches) {
+      // Stacked, all visible — the CSS fallback handles the layout.
+      section.dataset.mode = 'static';
+    } else {
+      section.dataset.mode = 'pinned';
+
+      /**
+       * Splits the pinned scroll distance into one equal segment per panel.
+       * Deterministic — panel N is live for exactly the Nth screen of scroll —
+       * rather than "whichever step is nearest", which drifts near boundaries.
+       */
+      const sync = () => {
+        const rect = section.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+
+        const stage = section.querySelector<HTMLElement>('.stage');
+        const stageH = stage?.offsetHeight ?? window.innerHeight;
+        const travel = rect.height - stageH;
+        if (travel <= 0) return;
+
+        const navH = window.innerHeight - stageH;
+        const scrolled = Math.min(Math.max(navH - rect.top, 0), travel);
+        const progress = scrolled / travel;
+
+        const last = panels.length - 1;
+        activate(Math.min(last, Math.floor(progress * panels.length)));
+      };
+
+      // Three rect reads per scroll event is cheap enough to run unthrottled,
+      // and unlike an rAF-gated handler it cannot wedge if a frame is dropped
+      // (background tab, heavy paint) and leave the sequence stuck.
+      window.addEventListener('scroll', sync, { passive: true });
+      window.addEventListener('resize', sync, { passive: true });
+      sync();
+    }
+  }
+</script>
+
+<style>
+  .showcase {
+    position: relative;
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  /* --- pinned mode (the default once JS runs) --- */
+  .showcase[data-mode='pinned'] .stage {
+    position: sticky;
+    top: var(--nav-h);
+    height: calc(100svh - var(--nav-h));
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  .showcase[data-mode='pinned'] .panels {
+    position: relative;
+    width: 100%;
+    max-width: var(--wrap);
+    height: 100%;
+    padding-inline: var(--s4);
+  }
+
+  .showcase[data-mode='pinned'] .panel {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: var(--s5);
+    padding-block: var(--s5);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 520ms var(--ease),
+      visibility 0s linear 520ms;
+  }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 520ms var(--ease),
+      visibility 0s;
+  }
+
+  /* Photo and copy travel a short distance as a panel takes over. */
+  .showcase[data-mode='pinned'] .panel-shot,
+  .showcase[data-mode='pinned'] .panel-copy > * {
+    transform: translateY(22px);
+    opacity: 0;
+    transition:
+      transform 640ms var(--ease),
+      opacity 520ms var(--ease);
+  }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-shot,
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-copy > * {
+    transform: none;
+    opacity: 1;
+  }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-copy > *:nth-child(1) { transition-delay: 40ms; }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-copy > *:nth-child(2) { transition-delay: 90ms; }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-copy > *:nth-child(3) { transition-delay: 130ms; }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-copy > *:nth-child(4) { transition-delay: 170ms; }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-copy > *:nth-child(5) { transition-delay: 210ms; }
+  .showcase[data-mode='pinned'] .panel[data-active='true'] .panel-copy > *:nth-child(6) { transition-delay: 250ms; }
+
+  /*
+   * The stage is sticky inside .showcase, so the distance it stays pinned is
+   * (section height − stage height) — i.e. exactly the height of .steps.
+   * Three quarters of a screen per panel keeps the sequence brisk: long
+   * enough to read a panel, short enough that nobody feels trapped in it.
+   */
+  .showcase[data-mode='pinned'] .step { height: 75svh; }
+
+  .showcase[data-mode='pinned'] .ticks {
+    position: absolute;
+    inset-block-end: var(--s5);
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: var(--s2);
+  }
+  .ticks li {
+    width: 22px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 24%);
+    transition: background-color 300ms var(--ease), width 300ms var(--ease);
+  }
+  .ticks li[data-active='true'] {
+    background: var(--red);
+    width: 34px;
+  }
+
+  /* --- static fallback: no JS, or reduced motion --- */
+  .showcase:not([data-mode='pinned']) .steps { display: none; }
+  .showcase:not([data-mode='pinned']) .ticks { display: none; }
+  .showcase:not([data-mode='pinned']) .stage {
+    max-width: var(--wrap);
+    margin-inline: auto;
+    padding: var(--s8) var(--s4);
+  }
+  .showcase:not([data-mode='pinned']) .panels {
+    display: grid;
+    gap: var(--s8);
+  }
+  .showcase:not([data-mode='pinned']) .panel {
+    display: grid;
+    gap: var(--s5);
+    justify-items: center;
+  }
+  .showcase:not([data-mode='pinned']) .panel-shot { pointer-events: auto; }
+
+  /* --- shared panel styling --- */
+  .panel-shot {
+    display: block;
+    width: min(62vw, 300px);
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: rgb(255 255 255 / 4%);
+  }
+  .panel-shot :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .panel-copy {
+    display: grid;
+    gap: var(--s2);
+    justify-items: center;
+    text-align: center;
+    max-width: 44ch;
+  }
+
+  .panel-index {
+    font-family: var(--font-en);
+    font-size: var(--fs-xs);
+    letter-spacing: 0.18em;
+    color: rgb(255 255 255 / 55%);
+    font-variant-numeric: tabular-nums;
+    /* "01 / 03" is digits and a slash — all bidi-neutral, so it would reorder
+       to "03 / 01" inside the Arabic page without an explicit isolate. */
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  .panel-name {
+    font-size: var(--fs-2xl);
+    font-family: var(--font-ar);
+    color: var(--white);
+  }
+  .panel-name-en {
+    font-family: var(--font-en);
+    font-size: var(--fs-base);
+    color: rgb(255 255 255 / 68%);
+  }
+  .panel .spec-line { color: rgb(255 255 255 / 55%); }
+
+  .panel-benefit {
+    font-size: var(--fs-base);
+    color: rgb(255 255 255 / 88%);
+    line-height: 1.7;
+  }
+
+  .panel-price {
+    margin-block-start: var(--s2);
+    font-size: var(--fs-2xl);
+  }
+
+  .panel-cta {
+    margin-block-start: var(--s3);
+    color: var(--white);
+    border-color: rgb(255 255 255 / 45%);
+  }
+  .panel-cta:hover {
+    background: var(--white);
+    color: var(--navy);
+    border-color: var(--white);
+  }
+
+  /* Centre alignment beats the page-direction rules for this block only. */
+  .panel :global(.name-ar),
+  .panel :global(.name-en),
+  .panel :global(.spec-line) { text-align: center; }
+
+  @media (min-width: 900px) {
+    .showcase[data-mode='pinned'] .panel {
+      grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+      align-items: center;
+      justify-items: stretch;
+      gap: var(--s8);
+      padding-inline: var(--s6);
+    }
+    .panel-shot { width: 100%; max-width: 420px; }
+    .panel-copy { justify-items: start; text-align: start; }
+    .panel :global(.name-ar),
+    .panel :global(.name-en),
+    .panel :global(.spec-line) { text-align: start; }
+    .panel-name { font-size: var(--fs-3xl); }
+    .showcase[data-mode='pinned'] .ticks {
+      inset-inline-start: auto;
+      inset-inline-end: var(--s6);
+      inset-block-end: var(--s6);
+      transform: none;
+      flex-direction: column;
+    }
+    .ticks li { width: 3px; height: 22px; }
+    .ticks li[data-active='true'] { width: 3px; height: 34px; }
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import T from '../components/T.astro';
+---
+
+<Layout
+  titleAr="الصفحة مو موجودة — SHM"
+  titleEn="Page not found — SHM"
+  descAr="الرابط اللي فتحته مو موجود."
+  descEn="That link does not exist."
+  canonicalPath="/404"
+  noindex>
+  <div class="wrap page">
+    <p class="code">404</p>
+    <h1 class="title"><T k="notfound.title" /></h1>
+    <p class="body"><T k="notfound.body" /></p>
+    <a class="btn btn-primary" href="/"><T k="notfound.cta" /></a>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    padding-block: var(--s9);
+    text-align: start;
+    max-width: 46ch;
+  }
+  .code {
+    font-family: var(--font-en);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--gray-500);
+  }
+  .title {
+    margin-block: var(--s3) var(--s4);
+    font-size: var(--fs-3xl);
+  }
+  .body {
+    color: var(--gray-700);
+    margin-block-end: var(--s6);
+  }
+</style>

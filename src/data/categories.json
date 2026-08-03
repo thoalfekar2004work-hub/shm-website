@@ -1,0 +1,6 @@
+[
+  { "slug": "scissors", "name_en": "Scissors", "name_ar": "مقصات", "tile_product": "iris-scissors-red-curved", "sort": 10 },
+  { "slug": "needle-holders", "name_en": "Needle Holders", "name_ar": "ماسكات الإبر", "tile_product": "needle-holder-halsey-tc-12-5cm", "sort": 20 },
+  { "slug": "forceps", "name_en": "Forceps", "name_ar": "الفورسبس", "tile_product": "forceps-curved", "sort": 30 },
+  { "slug": "hemostats", "name_en": "Hemostats", "name_ar": "المشابك", "tile_product": "hemostat-kelly-15cm", "sort": 40 }
+]

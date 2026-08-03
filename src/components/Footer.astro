@@ -1,0 +1,131 @@
+---
+import T from './T.astro';
+import { WHATSAPP_LINK, WHATSAPP_NUMBER, INSTAGRAM_URL, FACEBOOK_URL } from '../i18n/strings';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="foot">
+  <div class="wrap foot-inner">
+    <div class="foot-brand">
+      <img src="/shm-logo-white.png" alt="SHM" width="278" height="353" />
+      <p class="proof"><T k="proof.strip" /></p>
+    </div>
+
+    <div class="foot-contact">
+      <h2 class="foot-h"><T k="footer.contact" /></h2>
+      <a class="wa" href={WHATSAPP_LINK} rel="noopener">
+        <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" fill="currentColor">
+          <path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.1-.2 0-.4.1-.5l.4-.5.2-.4v-.4l-.7-1.7c-.2-.4-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.6 4 5 5 0 0 0 2.9.6 2.6 2.6 0 0 0 1.7-1.2 2.1 2.1 0 0 0 .1-1.2l-.4-.3Z"></path>
+        </svg>
+        <span dir="ltr">{WHATSAPP_NUMBER}</span>
+      </a>
+
+      {(INSTAGRAM_URL || FACEBOOK_URL) && (
+        <div class="social">
+          {INSTAGRAM_URL && (
+            <a href={INSTAGRAM_URL} rel="noopener" target="_blank" aria-label="Instagram">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none"
+                stroke="currentColor" stroke-width="1.8">
+                <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+                <circle cx="12" cy="12" r="4"></circle>
+                <circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"></circle>
+              </svg>
+              <span>Instagram</span>
+            </a>
+          )}
+          {FACEBOOK_URL && (
+            <a href={FACEBOOK_URL} rel="noopener" target="_blank" aria-label="Facebook">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="currentColor">
+                <path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"></path>
+              </svg>
+              <span>Facebook</span>
+            </a>
+          )}
+        </div>
+      )}
+    </div>
+  </div>
+
+  <div class="wrap foot-legal">
+    <span>© {year} SHM · <T k="footer.rights" /></span>
+  </div>
+</footer>
+
+<style>
+  .foot {
+    margin-block-start: var(--s9);
+    background: var(--navy);
+    color: var(--white);
+    padding-block: var(--s7) var(--s5);
+  }
+
+  .foot-inner {
+    display: grid;
+    gap: var(--s7);
+  }
+
+  .foot-brand img { height: 46px; width: auto; }
+
+  .proof {
+    margin-block-start: var(--s4);
+    max-width: 46ch;
+    font-size: var(--fs-sm);
+    color: rgb(255 255 255 / 80%);
+    line-height: 1.8;
+  }
+
+  .foot-h {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: rgb(255 255 255 / 65%);
+    margin-block-end: var(--s3);
+  }
+
+  .wa {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    font-size: var(--fs-lg);
+    font-weight: 600;
+    min-height: 44px;
+  }
+  .wa:hover { text-decoration: underline; }
+
+  .social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+    margin-block-start: var(--s4);
+    font-size: var(--fs-sm);
+  }
+  .social a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s2);
+    min-height: 44px;
+    padding-inline: var(--s3);
+    border-radius: var(--radius-sm);
+    color: rgb(255 255 255 / 85%);
+    border: 1px solid rgb(255 255 255 / 18%);
+    transition: background-color 180ms var(--ease), color 180ms var(--ease),
+      border-color 180ms var(--ease);
+  }
+  .social a:hover {
+    background: rgb(255 255 255 / 10%);
+    border-color: rgb(255 255 255 / 34%);
+    color: var(--white);
+  }
+
+  .foot-legal {
+    margin-block-start: var(--s7);
+    padding-block-start: var(--s4);
+    border-block-start: 1px solid rgb(255 255 255 / 12%);
+    font-size: var(--fs-xs);
+    color: rgb(255 255 255 / 55%);
+  }
+
+  @media (min-width: 768px) {
+    .foot-inner { grid-template-columns: 1.4fr 1fr; gap: var(--s6); }
+  }
+</style>

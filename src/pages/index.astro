@@ -1,0 +1,237 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import T from '../components/T.astro';
+import Showcase from '../components/Showcase.astro';
+import BestSellers from '../components/BestSellers.astro';
+import {
+  categories,
+  heroFor,
+  lowestPriceIn,
+  productsInCategory,
+  bySlug,
+  sets,
+} from '../lib/catalog';
+import { HERO_LINE_1, HERO_LINE_2, HERO_LINE_3_AR, formatPrice } from '../i18n/strings';
+
+const tiles = categories.map((c) => ({
+  cat: c,
+  hero: heroFor(c.tile_product),
+  from: lowestPriceIn(c.slug),
+  count: productsInCategory(c.slug).length,
+  tileProduct: bySlug(c.tile_product)!,
+}));
+
+const setsFrom = sets.reduce((min, s) => Math.min(min, s.price_iqd), Infinity);
+const setsTile = sets[0];
+---
+
+<Layout
+  titleAr="SHM — أدوات جراحية Natra في العراق"
+  titleEn="SHM — Natra Surgical Instruments in Iraq"
+  descAr="أدوات جراحية بعلامة Natra، ستانلس ستيل بعلامة CE. نفحص كل قطعة قبل الشحن والتبديل متوفر عند وجود خلل واضح. الدفع عند الاستلام."
+  descEn="Natra-brand surgical instruments, CE-marked stainless steel. Every piece is QC-tested before shipping, with an exchange guarantee for clear defects. Cash on delivery."
+  canonicalPath="/"
+  ogImage="/og-default.jpg">
+  <section class="hero">
+    <div class="wrap">
+      <h1 class="h1 hero-en enter enter-1" lang="en" dir="ltr">{HERO_LINE_1}</h1>
+      <p class="h2 hero-en enter enter-2" lang="en" dir="ltr">{HERO_LINE_2}</p>
+      <p class="h3 hero-ar enter enter-3" lang="ar" dir="rtl">{HERO_LINE_3_AR}</p>
+      <a class="btn btn-primary hero-cta enter enter-4" href="#catalog"><T k="hero.cta" /></a>
+    </div>
+  </section>
+
+  <div class="proofstrip">
+    <div class="wrap"><T k="proof.strip" /></div>
+  </div>
+
+  <Showcase />
+
+  <section class="wrap catalog" id="catalog">
+    <ul class="grid">
+      {tiles.map(({ cat, hero, from, tileProduct }, i) => (
+        <li data-reveal data-reveal-delay={i * 80}>
+          <a class="tile" href={`/category/${cat.slug}`}>
+            <div class="shot">
+              <Image
+                src={hero}
+                alt={tileProduct.name_en}
+                width={720}
+                widths={[320, 480, 720]}
+                sizes="(min-width: 900px) 270px, (min-width: 560px) 44vw, 90vw"
+                loading={i < 2 ? 'eager' : 'lazy'}
+                fetchpriority={i === 0 ? 'high' : undefined}
+                format="webp"
+                quality={78}
+              />
+            </div>
+            <div class="meta">
+              <h2 class="name-ar" lang="ar" dir="rtl">{cat.name_ar}</h2>
+              <p class="name-en" lang="en" dir="ltr">{cat.name_en}</p>
+              <p class="from">
+                <T k="grid.from" />{' '}
+                <span class="price">
+                  <span data-t="ar">{formatPrice(from, 'ar')}</span><span data-t="en"
+                    >{formatPrice(from, 'en')}</span>
+                </span>
+              </p>
+            </div>
+          </a>
+        </li>
+      ))}
+
+      {setsTile && (
+        <li data-reveal data-reveal-delay={tiles.length * 80}>
+          <a class="tile" href="/sets">
+            <div class="shot">
+              <Image
+                src={heroFor(setsTile.slug)}
+                alt={setsTile.name_en}
+                width={720}
+                widths={[320, 480, 720]}
+                sizes="(min-width: 900px) 270px, (min-width: 560px) 44vw, 90vw"
+                loading="lazy"
+                format="webp"
+                quality={78}
+              />
+            </div>
+            <div class="meta">
+              <h2 class="name-ar" lang="ar" dir="rtl">الستات</h2>
+              <p class="name-en" lang="en" dir="ltr">Sets</p>
+              <p class="from">
+                <T k="grid.from" />{' '}
+                <span class="price">
+                  <span data-t="ar">{formatPrice(setsFrom, 'ar')}</span><span data-t="en"
+                    >{formatPrice(setsFrom, 'en')}</span>
+                </span>
+              </p>
+            </div>
+          </a>
+        </li>
+      )}
+    </ul>
+  </section>
+
+  <BestSellers />
+</Layout>
+
+<style>
+  .hero {
+    padding-block: var(--s8) var(--s7);
+  }
+
+  .h1 {
+    font-family: var(--font-en);
+    font-size: var(--fs-3xl);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    max-width: 17ch;
+    text-align: start;
+  }
+
+  /* The heading carries dir="ltr" for correct punctuation, so its own logical
+     margins resolve LTR too. Pin the box to the page's start side explicitly. */
+  :global(html[dir='rtl']) .h1 { margin-left: auto; margin-right: 0; }
+  :global(html[dir='ltr']) .h1 { margin-right: auto; margin-left: 0; }
+
+  .h2 {
+    margin-block-start: var(--s4);
+    font-family: var(--font-en);
+    font-size: var(--fs-lg);
+    color: var(--gray-500);
+    font-weight: 400;
+    text-align: start;
+  }
+
+  .h3 {
+    margin-block-start: var(--s2);
+    font-family: var(--font-ar);
+    font-size: var(--fs-lg);
+    color: var(--gray-500);
+    font-weight: 400;
+    text-align: start;
+  }
+
+  .hero-cta {
+    margin-block-start: var(--s6);
+  }
+
+  .proofstrip {
+    background: var(--navy);
+    color: rgb(255 255 255 / 92%);
+    font-size: var(--fs-sm);
+    padding-block: var(--s4);
+    line-height: 1.7;
+  }
+
+  .catalog {
+    padding-block: var(--s8);
+    scroll-margin-block-start: var(--nav-h);
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--s5);
+    grid-template-columns: 1fr;
+  }
+
+  .tile {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--white);
+    transition: transform 170ms var(--ease), box-shadow 170ms var(--ease);
+  }
+
+  .shot {
+    aspect-ratio: 4 / 3;
+    background: var(--navy);
+  }
+  .shot :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .meta {
+    padding: var(--s5);
+    display: grid;
+    gap: 3px;
+  }
+
+  .name-ar {
+    font-size: var(--fs-xl);
+    font-family: var(--font-ar);
+    text-align: start;
+  }
+  .name-en {
+    font-family: var(--font-en);
+    font-size: var(--fs-sm);
+    color: var(--gray-500);
+    text-align: start;
+  }
+  .from {
+    margin-block-start: var(--s3);
+    font-size: var(--fs-base);
+    color: var(--gray-700);
+    text-align: start;
+  }
+
+  @media (min-width: 560px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(3, 1fr); gap: var(--s6); }
+    .hero { padding-block: var(--s9) var(--s8); }
+    .h1 { font-size: var(--fs-4xl); }
+  }
+
+  @media (hover: hover) and (min-width: 768px) {
+    .tile:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .tile:hover { transform: none; }
+  }
+</style>

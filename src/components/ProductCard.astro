@@ -1,0 +1,149 @@
+---
+import { Image } from 'astro:assets';
+import T from './T.astro';
+import Price from './Price.astro';
+import { heroFor, altFor, promoActive, type Product } from '../lib/catalog';
+
+interface Props {
+  product: Product;
+  /** Eager-load the first row of cards; lazy-load the rest. */
+  eager?: boolean;
+}
+
+const { product, eager = false } = Astro.props;
+const hero = heroFor(product.slug);
+const onOffer = promoActive(product);
+---
+
+<a class="card" href={`/product/${product.slug}`} data-promo-scope={product.slug}>
+  <div class="shot">
+    <Image
+      src={hero}
+      alt={altFor(product, hero, 0)}
+      width={640}
+      widths={[280, 420, 640]}
+      sizes="(min-width: 900px) 280px, (min-width: 560px) 42vw, 88vw"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? 'high' : undefined}
+      format="webp"
+      quality={78}
+    />
+    <div class="flags">
+      {onOffer && (
+        <span class="badge offer" data-promo-part><T k="product.offer" /></span>
+      )}
+      {product.best_seller && (
+        <span class="badge seller"><T k="product.bestSeller" /></span>
+      )}
+      {product.low_stock && product.in_stock && (
+        <span class="badge stock"><T k="product.lowStock" /></span>
+      )}
+      {!product.in_stock && (
+        <span class="badge stock"><T k="product.unavailable" /></span>
+      )}
+    </div>
+  </div>
+
+  <div class="meta">
+    {/* Both languages always show on a tile, in both language modes (spec §6). */}
+    <h3 class="name-ar" lang="ar" dir="rtl">{product.name_ar}</h3>
+    <p class="name-en" lang="en" dir="ltr">{product.name_en}</p>
+    <p class="pricerow"><Price product={product} /></p>
+  </div>
+</a>
+
+<style>
+  .card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--white);
+    transition: transform 170ms var(--ease), box-shadow 170ms var(--ease);
+  }
+
+  .shot {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: var(--navy);
+    overflow: hidden;
+  }
+  .shot :global(img) {
+    width: 100%;
+    height: 100%;
+    /* `contain`, not `cover`: the set photos are landscape and `cover` was
+       slicing the outer instruments off. Every shot is on the same navy
+       backdrop, so the letterboxing is invisible. */
+    object-fit: contain;
+    transition: transform 500ms var(--ease);
+  }
+
+  .flags {
+    position: absolute;
+    inset-block-start: var(--s3);
+    inset-inline-start: var(--s3);
+    inset-inline-end: var(--s3);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2);
+  }
+  .flags .badge {
+    /* Solid, not translucent + backdrop-filter: Safari treats backdrop-filter
+       as another compositing trigger and it interacts badly with the sticky
+       bar scrolling past. */
+    background: var(--white);
+  }
+  /* Navy, not red: §0.3 keeps red for prices and primary CTAs. The struck
+     original beside the red price already carries the offer. */
+  .flags .offer {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+  }
+  .flags .seller {
+    background: var(--navy-raised);
+    color: var(--white);
+    border-color: var(--navy-raised);
+  }
+
+  .meta {
+    padding: var(--s4);
+    display: grid;
+    gap: 3px;
+  }
+
+  .name-ar {
+    font-size: var(--fs-base);
+    font-weight: 600;
+    font-family: var(--font-ar);
+    text-align: start;
+  }
+
+  .name-en {
+    font-family: var(--font-en);
+    font-size: var(--fs-sm);
+    color: var(--gray-500);
+    text-align: start;
+  }
+
+  .pricerow {
+    margin-block-start: var(--s2);
+    font-size: var(--fs-lg);
+    text-align: start;
+  }
+
+  /* Desktop-only lift; no bounce, no scale gimmicks (spec §6). */
+  @media (hover: hover) and (min-width: 768px) {
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+    /* The photo eases in slightly behind the frame — reads as depth, not zoom. */
+    .card:hover .shot :global(img) { transform: scale(1.04); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover { transform: none; }
+    .card:hover .shot :global(img) { transform: none; }
+  }
+</style>

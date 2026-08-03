@@ -1,0 +1,42 @@
+---
+/**
+ * A product price, with the previous price struck through while an offer runs.
+ *
+ * `price_iqd` is always what the customer pays — the struck-through figure is
+ * only a reference. Build-time validation refuses a `was_iqd` that is not
+ * genuinely higher, so this can never show a fake saving.
+ */
+import { promoActive, type Product } from '../lib/catalog';
+import { formatPrice, t } from '../i18n/strings';
+
+interface Props {
+  product: Product;
+  class?: string;
+}
+
+const { product: p, class: cls } = Astro.props;
+const showWas = promoActive(p);
+---
+
+{showWas && p.promo && (
+  <s class="was" data-promo-part aria-label={t['product.wasPrice'].ar}>
+    <span data-t="ar">{formatPrice(p.promo.was_iqd, 'ar')}</span><span data-t="en"
+      >{formatPrice(p.promo.was_iqd, 'en')}</span>
+  </s>
+)}<span class:list={['price', cls]}>
+  <span data-t="ar">{formatPrice(p.price_iqd, 'ar')}</span><span data-t="en"
+    >{formatPrice(p.price_iqd, 'en')}</span>
+</span>
+
+<style>
+  .was {
+    margin-inline-end: var(--s3);
+    color: var(--gray-500);
+    font-weight: 400;
+    font-size: 0.72em;
+    text-decoration-thickness: 1.5px;
+    /* Latin digits stay LTR inside Arabic text. */
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+</style>

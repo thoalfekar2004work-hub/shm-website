@@ -1,0 +1,5 @@
+# Cloudflare Pages project config.
+# Build: `npm run build`  ·  Output: `dist`  ·  functions/ is auto-detected.
+name = "shm-website"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-07-01"

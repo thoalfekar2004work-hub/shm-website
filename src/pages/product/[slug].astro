@@ -1,0 +1,710 @@
+---
+import { Image, getImage } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import T from '../../components/T.astro';
+import Price from '../../components/Price.astro';
+import Countdown from '../../components/Countdown.astro';
+import {
+  products,
+  imagesFor,
+  altFor,
+  specs,
+  benefit,
+  contents,
+  specialty,
+  promoActive,
+} from '../../lib/catalog';
+import { formatPrice, t, WHATSAPP_INTL, SITE_URL } from '../../i18n/strings';
+
+export function getStaticPaths() {
+  return products.map((product) => ({
+    params: { slug: product.slug },
+    props: { product },
+  }));
+}
+
+const { product: p } = Astro.props;
+const shots = imagesFor(p.slug);
+const hero = shots[0];
+
+// Two derivatives per shot: one sized for the on-page gallery, one for the
+// lightbox. Surgeons inspect tips and locks, so the zoom stays large — but it
+// is only fetched when someone actually opens the lightbox (see the script).
+const display = await Promise.all(
+  shots.map((img) => getImage({ src: img, width: 1000, format: 'webp', quality: 80 })),
+);
+// 1200px covers a 390px phone at 3× DPR, which is what pinch-zoom actually
+// resolves — larger just costs bytes on a mobile connection.
+const zoom = await Promise.all(
+  shots.map((img) => getImage({ src: img, width: 1200, format: 'webp', quality: 78 })),
+);
+
+const specsAr = specs(p, 'ar');
+const specsEn = specs(p, 'en');
+const benefitAr = benefit(p, 'ar');
+const benefitEn = benefit(p, 'en');
+const contentsAr = contents(p, 'ar');
+const contentsEn = contents(p, 'en');
+const specialtyAr = specialty(p, 'ar');
+const specialtyEn = specialty(p, 'en');
+
+// Prefilled WhatsApp order message (spec §7).
+const waText = encodeURIComponent(`مرحبا، مهتم بـ ${p.name_ar} — ${p.spec_line_en}`);
+const waHref = `https://wa.me/${WHATSAPP_INTL}?text=${waText}`;
+
+const ogImage = `/og/${p.slug}.jpg`;
+const priceAr = formatPrice(p.price_iqd, 'ar');
+const priceEn = formatPrice(p.price_iqd, 'en');
+
+const onOffer = promoActive(p);
+
+const ogTitle = `${p.name_ar} — ${p.spec_line_en}`;
+const ogDesc = `${priceAr} · ${t['product.qcLine'].ar}`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: p.name_en,
+  alternateName: p.name_ar,
+  description: benefitEn ?? p.spec_line_en,
+  brand: { '@type': 'Brand', name: 'Natra' },
+  image: new URL(ogImage, SITE_URL).href,
+  sku: p.slug,
+  offers: {
+    '@type': 'Offer',
+    price: p.price_iqd,
+    priceCurrency: 'IQD',
+    availability: p.in_stock
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock',
+    url: new URL(`/product/${p.slug}/`, SITE_URL).href,
+  },
+};
+---
+
+<Layout
+  titleAr={`${p.name_ar} — ${priceAr} — SHM`}
+  titleEn={`${p.name_en} — ${priceEn} — SHM`}
+  descAr={ogDesc}
+  descEn={`${priceEn} · ${t['product.qcLine'].en}`}
+  canonicalPath={`/product/${p.slug}/`}
+  ogTitle={ogTitle}
+  ogImage={ogImage}
+  ogImageAlt={p.name_en}>
+  <Fragment slot="head">
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <article class="wrap product">
+    <div class="layout">
+      <!-- 1. Gallery -->
+      <section class="gallery enter enter-1" aria-label="Product photos">
+        <button
+          type="button"
+          class="mainshot"
+          id="lightbox-open"
+          data-arialabel-ar={t['gallery.viewLarger'].ar}
+          data-arialabel-en={t['gallery.viewLarger'].en}
+          aria-label={t['gallery.viewLarger'].ar}>
+          <Image
+            id="main-image"
+            src={hero}
+            alt={altFor(p, hero, 0)}
+            width={1000}
+            widths={[480, 720, 1000]}
+            sizes="(min-width: 900px) 520px, 94vw"
+            loading="eager"
+            fetchpriority="high"
+            format="webp"
+            quality={82}
+          />
+        </button>
+
+        {shots.length > 1 && (
+          <ul class="thumbs">
+            {shots.map((img, i) => (
+              <li>
+                <button
+                  type="button"
+                  class:list={['thumb', { on: i === 0 }]}
+                  data-index={i}
+                  aria-label={`${t['gallery.shot'].ar} ${i + 1}`}
+                  data-arialabel-ar={`${t['gallery.shot'].ar} ${i + 1}`}
+                  data-arialabel-en={`${t['gallery.shot'].en} ${i + 1}`}>
+                  <Image
+                    src={img}
+                    alt={altFor(p, img, i)}
+                    width={180}
+                    widths={[120, 180]}
+                    sizes="80px"
+                    loading="lazy"
+                    format="webp"
+                    quality={70}
+                  />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <!-- 2..8 Detail column -->
+      <section class="detail enter enter-2" data-promo-scope={p.slug}>
+        <div class="flags">
+          {onOffer && (
+            <span class="badge offer" data-promo-part><T k="product.offer" /></span>
+          )}
+          {p.best_seller && (
+            <span class="badge seller"><T k="product.bestSeller" /></span>
+          )}
+          {p.low_stock && p.in_stock && (
+            <span class="badge"><T k="product.lowStock" /></span>
+          )}
+          {(specialtyAr || specialtyEn) && (
+            <span class="badge">
+              <span data-t="ar">{specialtyAr ?? specialtyEn}</span><span data-t="en"
+                >{specialtyEn ?? specialtyAr}</span>
+            </span>
+          )}
+        </div>
+
+        <h1 class="name-ar" lang="ar" dir="rtl">{p.name_ar}</h1>
+        <p class="name-en" lang="en" dir="ltr">{p.name_en}</p>
+        <p class="spec-line">{p.spec_line_en}</p>
+
+        <p class="bigprice"><Price product={p} /></p>
+
+        {onOffer && p.promo && (
+          <div class="offerbox" data-promo-part>
+            <Countdown ends={p.promo.ends} />
+          </div>
+        )}
+
+        {(specsAr.length > 0 || specsEn.length > 0) && (
+          <ul class="specs">
+            {specsAr.map((s, i) => (
+              <li>
+                <span data-t="ar">{s}</span><span data-t="en">{specsEn[i] ?? s}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {(contentsAr.length > 0 || contentsEn.length > 0) && (
+          <ul class="specs contents">
+            {contentsAr.map((s, i) => (
+              <li>
+                <span data-t="ar">{s}</span><span data-t="en">{contentsEn[i] ?? s}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {(benefitAr || benefitEn) && (
+          <p class="benefit">
+            <span data-t="ar">{benefitAr}</span><span data-t="en">{benefitEn}</span>
+          </p>
+        )}
+
+        <p class="qc"><T k="product.qcLine" /></p>
+
+        <div class="ctas">
+          {p.in_stock ? (
+            <div class="cartctl" id="cart-control" data-slug={p.slug} data-state="add">
+              {/* Swaps to a quantity stepper once this product is in the cart. */}
+              <button type="button" class="btn btn-primary addbtn" id="add-to-cart">
+                <T k="product.addToCart" />
+              </button>
+
+              <div class="stepper faceoff" aria-hidden="true">
+                <button
+                  type="button"
+                  class="stepbtn"
+                  data-step="-1"
+                  data-arialabel-ar={t['cart.decrease'].ar}
+                  data-arialabel-en={t['cart.decrease'].en}
+                  aria-label={t['cart.decrease'].ar}>−</button>
+                <span class="stepqty" id="step-qty" role="status" aria-live="polite">
+                  <span class="stepnum">1</span>
+                  <span class="steplabel"><T k="product.inCart" /></span>
+                </span>
+                <button
+                  type="button"
+                  class="stepbtn"
+                  data-step="1"
+                  data-arialabel-ar={t['cart.increase'].ar}
+                  data-arialabel-en={t['cart.increase'].en}
+                  aria-label={t['cart.increase'].ar}>+</button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" class="btn" disabled>
+              <T k="product.unavailable" />
+            </button>
+          )}
+          <a class="btn btn-secondary" href={waHref} rel="noopener">
+            <T k="product.orderWhatsApp" />
+          </a>
+        </div>
+
+        <p class="undercta">
+          <a class="tocart" id="to-cart" href="/cart" hidden>
+            <T k="product.viewCart" /> →
+          </a>
+          <span class="deliv"><T k="cart.deliveryNote" /></span>
+        </p>
+      </section>
+    </div>
+  </article>
+
+  <!-- Full-screen lightbox: macro shots are the proof, so zoom has to work. -->
+  <dialog class="lightbox" id="lightbox" aria-label={p.name_en}>
+    <button
+      type="button"
+      class="lb-close"
+      id="lightbox-close"
+      data-arialabel-ar={t['gallery.close'].ar}
+      data-arialabel-en={t['gallery.close'].en}
+      aria-label={t['gallery.close'].ar}>
+      <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18"></path>
+      </svg>
+    </button>
+    <div class="lb-stage" id="lb-stage">
+      {zoom.map((img, i) => (
+        <img
+          data-zoom-src={img.src}
+          alt={altFor(p, shots[i], i)}
+          data-lb-index={i}
+          hidden={i !== 0}
+          decoding="async"
+        />
+      ))}
+    </div>
+  </dialog>
+
+  <script
+    is:inline
+    type="application/json"
+    id="display-srcs"
+    set:html={JSON.stringify(display.map((d) => d.src))}
+  />
+</Layout>
+
+<script>
+  import { addToCart, setQty, qtyOf } from '../../scripts/cart';
+
+  // --- gallery -------------------------------------------------------------
+  const main = document.getElementById('main-image') as HTMLImageElement | null;
+  const thumbs = Array.from(document.querySelectorAll<HTMLButtonElement>('.thumb'));
+  const dialog = document.getElementById('lightbox') as HTMLDialogElement | null;
+  const openBtn = document.getElementById('lightbox-open');
+  const closeBtn = document.getElementById('lightbox-close');
+
+  const zoomImages = Array.from(
+    document.querySelectorAll<HTMLImageElement>('[data-lb-index]'),
+  );
+  const displaySrcs: string[] = JSON.parse(
+    document.getElementById('display-srcs')?.textContent || '[]',
+  );
+
+  let current = 0;
+
+  /**
+   * Zoom images carry no src until the lightbox is opened — `loading="lazy"`
+   * does not reliably fire inside a closed <dialog>, and there is no reason to
+   * pull 1400px files for a visitor who never zooms.
+   */
+  function loadZoom(index: number) {
+    const img = zoomImages[index];
+    if (img && !img.getAttribute('src') && img.dataset.zoomSrc) {
+      img.src = img.dataset.zoomSrc;
+    }
+  }
+
+  function show(index: number) {
+    current = index;
+    if (main && displaySrcs[index]) {
+      main.src = displaySrcs[index];
+      main.srcset = '';
+      main.alt = zoomImages[index]?.alt ?? main.alt;
+    }
+    thumbs.forEach((b, i) => b.classList.toggle('on', i === index));
+    zoomImages.forEach((img, i) => (img.hidden = i !== index));
+    if (dialog?.open) loadZoom(index);
+  }
+
+  thumbs.forEach((btn) =>
+    btn.addEventListener('click', () => show(Number(btn.dataset.index))),
+  );
+
+  // --- lightbox ------------------------------------------------------------
+  openBtn?.addEventListener('click', () => {
+    loadZoom(current);
+    dialog?.showModal();
+    document.body.style.overflow = 'hidden';
+  });
+
+  const close = () => {
+    dialog?.close();
+    document.body.style.overflow = '';
+  };
+  closeBtn?.addEventListener('click', close);
+  dialog?.addEventListener('close', () => (document.body.style.overflow = ''));
+  dialog?.addEventListener('click', (e) => {
+    if (e.target === dialog) close();
+  });
+
+  // --- add to cart / quantity stepper --------------------------------------
+  const control = document.getElementById('cart-control');
+  const slug = control?.dataset.slug;
+
+  if (control && slug) {
+    const addBtn = document.getElementById('add-to-cart') as HTMLButtonElement | null;
+    const stepper = control.querySelector<HTMLElement>('.stepper');
+    const numEl = control.querySelector<HTMLElement>('.stepnum');
+    const toCart = document.getElementById('to-cart');
+
+    /**
+     * The control has two faces: "Add to Cart" while the product is not in the
+     * cart, and a − / qty / + stepper once it is. Rendered from cart state
+     * rather than from clicks, so it stays correct when the customer comes
+     * back to this page later or edits the cart in another tab.
+     */
+    function paint(animate = false) {
+      const qty = qtyOf(slug!);
+      const inCart = qty > 0;
+
+      control!.dataset.state = inCart ? 'stepper' : 'add';
+      addBtn?.classList.toggle('faceoff', inCart);
+      stepper?.classList.toggle('faceoff', !inCart);
+      if (addBtn) addBtn.tabIndex = inCart ? -1 : 0;
+      stepper?.setAttribute('aria-hidden', inCart ? 'false' : 'true');
+      stepper?.querySelectorAll('button').forEach((b) => (b.tabIndex = inCart ? 0 : -1));
+      if (toCart) toCart.hidden = !inCart;
+
+      if (numEl && inCart) {
+        const changed = numEl.textContent !== String(qty);
+        numEl.textContent = String(qty);
+        if (changed && animate) {
+          numEl.classList.remove('bump');
+          void numEl.offsetWidth; // restart the animation
+          numEl.classList.add('bump');
+        }
+      }
+    }
+
+    addBtn?.addEventListener('click', () => {
+      addToCart(slug, 1);
+      paint(true);
+    });
+
+    stepper?.querySelectorAll<HTMLButtonElement>('.stepbtn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setQty(slug, qtyOf(slug) + Number(btn.dataset.step));
+        paint(true);
+      });
+    });
+
+    // Another tab, or the cart page in the back/forward cache.
+    document.addEventListener('shm:cartchange', () => paint(false));
+    window.addEventListener('pageshow', () => paint(false));
+    paint(false);
+  }
+</script>
+
+<style>
+  .product { padding-block: var(--s6) var(--s8); }
+
+  .layout {
+    display: grid;
+    gap: var(--s6);
+  }
+
+  /* --- gallery --- */
+  .mainshot {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--navy);
+    cursor: zoom-in;
+    aspect-ratio: 1 / 1;
+  }
+  .mainshot :global(img) {
+    width: 100%;
+    height: 100%;
+    /* Show the whole instrument. `cover` was cropping the landscape set
+       photos; the navy backdrop makes the letterboxing invisible. */
+    object-fit: contain;
+  }
+
+  .thumbs {
+    display: flex;
+    gap: var(--s3);
+    margin-block-start: var(--s3);
+    overflow-x: auto;
+    padding-block-end: var(--s2);
+    scrollbar-width: thin;
+  }
+  .thumb {
+    flex: 0 0 auto;
+    width: 76px;
+    height: 76px;
+    padding: 0;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--navy);
+    cursor: pointer;
+  }
+  .thumb.on { border-color: var(--navy); }
+  .thumb :global(img) { width: 100%; height: 100%; object-fit: contain; }
+
+  /* --- detail --- */
+  .flags {
+    display: flex;
+    gap: var(--s2);
+    flex-wrap: wrap;
+    margin-block-end: var(--s3);
+  }
+  .flags:empty { display: none; }
+
+  .name-ar {
+    font-size: var(--fs-2xl);
+    font-family: var(--font-ar);
+    text-align: start;
+  }
+  .name-en {
+    margin-block-start: var(--s1);
+    font-family: var(--font-en);
+    font-size: var(--fs-lg);
+    color: var(--gray-700);
+    font-weight: 600;
+    text-align: start;
+  }
+  .spec-line { margin-block-start: var(--s2); }
+
+  .bigprice {
+    margin-block: var(--s5) var(--s4);
+    font-size: var(--fs-3xl);
+    text-align: start;
+  }
+
+  .offerbox {
+    margin-block-end: var(--s5);
+    padding: var(--s4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--gray-50);
+  }
+
+  .flags .offer {
+    background: var(--navy);
+    color: var(--white);
+    border-color: var(--navy);
+  }
+  .flags .seller {
+    background: var(--navy-raised);
+    color: var(--white);
+    border-color: var(--navy-raised);
+  }
+
+  .specs {
+    display: grid;
+    gap: var(--s2);
+    margin-block-end: var(--s5);
+  }
+  .specs li {
+    position: relative;
+    padding-inline-start: var(--s5);
+    font-size: var(--fs-base);
+    color: var(--gray-700);
+    text-align: start;
+  }
+  .specs li::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 6px;
+    top: 0.72em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gray-500);
+  }
+  .contents li::before { background: var(--navy); }
+
+  .benefit {
+    margin-block-end: var(--s5);
+    font-size: var(--fs-lg);
+    line-height: 1.7;
+    text-align: start;
+  }
+
+  .qc {
+    padding: var(--s4);
+    background: var(--gray-50);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+    line-height: 1.7;
+    text-align: start;
+  }
+
+  .ctas {
+    display: grid;
+    gap: var(--s3);
+    margin-block-start: var(--s5);
+  }
+
+  /* --- add-to-cart / stepper morph --- */
+  .cartctl {
+    position: relative;
+    display: grid;
+    min-height: 48px;
+  }
+  /* Both faces occupy the same cell so the swap has no layout shift. */
+  .cartctl > * {
+    grid-area: 1 / 1;
+    transition: opacity 180ms var(--ease), transform 220ms var(--ease);
+  }
+
+  .addbtn { width: 100%; }
+
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s2);
+    border: 1.5px solid var(--red-cta);
+    border-radius: var(--radius-sm);
+    background: var(--red-cta);
+    padding: 2px;
+    min-height: 48px;
+  }
+
+  .stepbtn {
+    flex: 0 0 auto;
+    width: 46px;
+    height: 44px;
+    border: 0;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 14%);
+    color: var(--white);
+    font-size: var(--fs-xl);
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 140ms var(--ease);
+  }
+  .stepbtn:hover { background: rgb(255 255 255 / 26%); }
+  .stepbtn:active { background: rgb(255 255 255 / 34%); }
+
+  .stepqty {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: var(--s2);
+    color: var(--white);
+    font-weight: 600;
+  }
+  .stepnum {
+    font-size: var(--fs-lg);
+    font-variant-numeric: tabular-nums;
+    display: inline-block;
+  }
+  .steplabel { font-size: var(--fs-sm); opacity: 0.85; }
+
+  /* Whichever face is not current gets this; the script owns the toggle. */
+  .faceoff {
+    opacity: 0;
+    transform: scale(0.96);
+    pointer-events: none;
+  }
+
+  /* Quantity tick — a short scale pulse, no bounce. */
+  @keyframes bump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.28); }
+    100% { transform: scale(1); }
+  }
+  .stepnum.bump { animation: bump 260ms var(--ease); }
+
+  .undercta {
+    margin-block-start: var(--s4);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s4);
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+    text-align: start;
+  }
+  .tocart {
+    color: var(--navy);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .deliv { color: var(--gray-500); }
+
+  /* --- lightbox --- */
+  .lightbox {
+    border: 0;
+    padding: 0;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    background: var(--navy);
+  }
+  .lightbox::backdrop { background: rgb(6 12 24 / 92%); }
+
+  .lb-stage {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    display: grid;
+    place-items: center;
+    /* pinch/zoom on phones: the browser handles it inside a scrollable box */
+    touch-action: pinch-zoom;
+    -webkit-overflow-scrolling: touch;
+  }
+  .lb-stage img {
+    max-width: 100%;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .lb-close {
+    position: fixed;
+    inset-block-start: max(var(--s4), env(safe-area-inset-top));
+    inset-inline-end: var(--s4);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 14%);
+    color: var(--white);
+    cursor: pointer;
+  }
+  .lb-close:hover { background: rgb(255 255 255 / 24%); }
+
+  @media (min-width: 900px) {
+    .layout {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--s8);
+      align-items: start;
+    }
+    .ctas { grid-template-columns: 1fr 1fr; }
+    .name-ar { font-size: var(--fs-3xl); }
+  }
+</style>

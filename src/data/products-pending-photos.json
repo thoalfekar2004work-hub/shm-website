@@ -1,0 +1,157 @@
+[
+  {
+    "_note": "IN STOCK but NOT published — no photos were supplied for these. To publish one: create src/assets/products/<slug>/ with 01-hero.jpg (+ macro shots), then move its entry into products.json. Nothing else is needed.",
+    "_source": "Stock/price taken from the owner's own inventory screenshots supplied with the product folders."
+  },
+  {
+    "slug": "forceps-straight",
+    "category": "forceps",
+    "name_en": "Forceps — Straight",
+    "name_ar": "فورسبس مستقيم",
+    "spec_line_en": "Forceps 12cm Straight — Natra",
+    "price_iqd": 20000,
+    "size": "12cm",
+    "variant_en": "Straight",
+    "variant_ar": "مستقيم",
+    "specs_en": [
+      "Size: 12cm",
+      "Non-slip grip",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "مسكة غير قابلة للانزلاق",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Aligned tips and non-slip grip for delicate tissue handling.",
+    "benefit_ar": "أطراف متطابقة ومسكة ثابتة لتعامل دقيق مع الأنسجة.",
+    "in_stock": true,
+    "low_stock": true,
+    "is_set": false,
+    "sort": 110
+  },
+  {
+    "slug": "hemostat-mosquito-straight",
+    "category": "hemostats",
+    "name_en": "Mosquito Hemostat — Straight",
+    "name_ar": "مشبك موسكيتو مستقيم",
+    "spec_line_en": "Mosquito Hemostat 13cm Straight — Natra",
+    "price_iqd": 30000,
+    "size": "13cm",
+    "variant_en": "Straight",
+    "variant_ar": "مستقيم",
+    "specs_en": [
+      "Size: 13cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 13 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Fine-tip clamp for precise hemostasis on small vessels.",
+    "benefit_ar": "طرف دقيق للسيطرة على النزيف بالأوعية الصغيرة.",
+    "in_stock": true,
+    "low_stock": true,
+    "is_set": false,
+    "sort": 130
+  },
+  {
+    "slug": "hemostat-mosquito-curved",
+    "category": "hemostats",
+    "name_en": "Mosquito Hemostat — Curved",
+    "name_ar": "مشبك موسكيتو منحني",
+    "spec_line_en": "Mosquito Hemostat 13cm Curved — Natra",
+    "price_iqd": 30000,
+    "size": "13cm",
+    "variant_en": "Curved",
+    "variant_ar": "منحني",
+    "specs_en": [
+      "Size: 13cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 13 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Fine-tip clamp for precise hemostasis on small vessels.",
+    "benefit_ar": "طرف دقيق للسيطرة على النزيف بالأوعية الصغيرة.",
+    "in_stock": true,
+    "low_stock": true,
+    "is_set": false,
+    "sort": 140
+  },
+  {
+    "slug": "iris-scissors-curved-micro-serrated",
+    "category": "scissors",
+    "name_en": "Iris Scissors — Curved Micro Serrated",
+    "name_ar": "مقص آيرس منحني مسنن دقيق",
+    "spec_line_en": "Iris Scissors 12cm Curved Micro Serrated — Natra",
+    "price_iqd": 30000,
+    "size": "12cm",
+    "variant_en": "Curved, Micro Serrated",
+    "variant_ar": "منحني مسنن",
+    "specs_en": [
+      "Size: 12cm",
+      "Serrated edge",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "حافة مسننة",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Serrated edge for higher control and reduced slipping during cutting.",
+    "benefit_ar": "مسنن لتحكم أعلى وتقليل الانزلاق أثناء الاستخدام.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 40,
+    "_note": "No photos supplied AND no matching line in the inventory screenshots — confirm this product exists before publishing."
+  },
+  {
+    "slug": "needle-holder",
+    "category": "needle-holders",
+    "name_en": "Needle Holder",
+    "name_ar": "ماسك الإبر",
+    "spec_line_en": "Needle Holder 12cm — Natra",
+    "price_iqd": 55000,
+    "size": "12cm",
+    "specs_en": [
+      "Size: 12cm",
+      "Smooth lock",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "قفل ناعم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Smooth, steady lock so the tool never fights you mid-suture.",
+    "benefit_ar": "قفل ناعم وثابت حتى ما تحس الأداة تقاومك أثناء الغرز.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 80,
+    "_note": "Looks like a duplicate of needle-holder-halsey-tc-12-5cm: same price, no separate photos, and the inventory screenshots list only one needle holder. Confirm before publishing."
+  }
+]

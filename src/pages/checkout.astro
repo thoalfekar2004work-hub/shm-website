@@ -1,0 +1,431 @@
+---
+import Layout from '../layouts/Layout.astro';
+import T from '../components/T.astro';
+import { products } from '../lib/catalog';
+import { GOVERNORATES, t, WHATSAPP_INTL } from '../i18n/strings';
+import { LIMITS } from '../lib/order-shared';
+
+const table = products.map((p) => ({
+  slug: p.slug,
+  ar: p.name_ar,
+  en: p.name_en,
+  sp: p.spec_line_en,
+  price: p.price_iqd,
+}));
+
+const labels = {
+  unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
+  qty: { ar: t['cart.qty'].ar, en: t['cart.qty'].en },
+  required: { ar: t['checkout.required'].ar, en: t['checkout.required'].en },
+  phoneError: { ar: t['form.phoneError'].ar, en: t['form.phoneError'].en },
+  sending: { ar: t['checkout.sending'].ar, en: t['checkout.sending'].en },
+  submit: { ar: t['form.submit'].ar, en: t['form.submit'].en },
+};
+---
+
+<Layout
+  titleAr="إتمام الطلب — SHM"
+  titleEn="Checkout — SHM"
+  descAr="الدفع عند الاستلام. نتواصل وياك على الواتساب لتأكيد الطلب قبل الشحن."
+  descEn="Cash on delivery. We message you on WhatsApp to confirm before shipping."
+  canonicalPath="/checkout/"
+  noindex>
+  <div class="wrap page">
+    <h1 class="title"><T k="checkout.title" /></h1>
+
+    <div id="co-empty" hidden>
+      <p class="empty"><T k="cart.empty" /></p>
+      <a class="btn btn-secondary" href="/"><T k="cart.continue" /></a>
+    </div>
+
+    <div class="cols" id="co-main" hidden>
+      <form id="order-form" novalidate>
+        <div class="field">
+          <label for="f-name"><T k="form.name" /></label>
+          <input id="f-name" name="name" type="text" required maxlength={LIMITS.name}
+            autocomplete="name" enterkeyhint="next" />
+          <p class="err" id="e-name" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="f-phone"><T k="form.phone" /></label>
+          <input id="f-phone" name="phone" type="tel" required inputmode="tel"
+            autocomplete="tel" dir="ltr" placeholder="07XXXXXXXXX" enterkeyhint="next" />
+          <p class="err" id="e-phone" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="f-gov"><T k="form.governorate" /></label>
+          <select id="f-gov" name="governorate" required>
+            <option value="" selected disabled></option>
+            {GOVERNORATES.map((g) => <option value={g}>{g}</option>)}
+          </select>
+          <p class="err" id="e-gov" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="f-address"><T k="form.address" /></label>
+          <textarea id="f-address" name="address" required rows="3"
+            maxlength={LIMITS.address} autocomplete="street-address"></textarea>
+          <p class="err" id="e-address" hidden></p>
+        </div>
+
+        {/* Honeypot: hidden from people, tempting to bots. */}
+        <div class="hp" aria-hidden="true">
+          <label for="f-company">Company</label>
+          <input id="f-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <button type="submit" class="btn btn-primary submit" id="submit-btn">
+          <T k="form.submit" />
+        </button>
+
+        <div class="failure" id="failure" hidden>
+          <p class="failtext"><T k="form.error" /></p>
+          <a class="btn btn-secondary" id="wa-fallback" href="#" rel="noopener">
+            <T k="checkout.whatsappFallback" />
+          </a>
+        </div>
+      </form>
+
+      <aside class="summary" aria-labelledby="sum-h">
+        <h2 id="sum-h" class="sum-title"><T k="cart.summary" /></h2>
+        <ul id="sum-lines" class="sumlines"></ul>
+        <div class="summinor">
+          <span><T k="cart.subtotal" /></span>
+          <span id="sum-subtotal"></span>
+        </div>
+        <div class="summinor">
+          <span><T k="cart.delivery" /></span>
+          <span id="sum-delivery"></span>
+        </div>
+        <div class="sumtotal">
+          <span><T k="cart.total" /></span>
+          <span class="price" id="sum-total"></span>
+        </div>
+        <p class="cod"><T k="cart.codNote" /></p>
+      </aside>
+    </div>
+  </div>
+
+  <script is:inline type="application/json" id="product-table" set:html={JSON.stringify(table)} />
+  <script is:inline type="application/json" id="co-labels" set:html={JSON.stringify(labels)} />
+  <script is:inline type="application/json" id="wa-number" set:html={JSON.stringify(WHATSAPP_INTL)} />
+</Layout>
+
+<script>
+  import { readCart, clearCart } from '../scripts/cart';
+  import { getLang } from '../scripts/i18n';
+  import { normalizePhone, PHONE_RE, DELIVERY_FEE_IQD } from '../lib/order-shared';
+
+  type Row = { slug: string; ar: string; en: string; sp: string; price: number };
+
+  const table: Row[] = JSON.parse(document.getElementById('product-table')?.textContent || '[]');
+  const labels = JSON.parse(document.getElementById('co-labels')?.textContent || '{}');
+  const waNumber = JSON.parse(document.getElementById('wa-number')?.textContent || '""');
+  const byslug = new Map(table.map((r) => [r.slug, r]));
+
+  const emptyEl = document.getElementById('co-empty');
+  const mainEl = document.getElementById('co-main');
+  const form = document.getElementById('order-form') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+  const failure = document.getElementById('failure');
+  const waFallback = document.getElementById('wa-fallback') as HTMLAnchorElement | null;
+  const sumLines = document.getElementById('sum-lines');
+  const sumTotal = document.getElementById('sum-total');
+  const sumSubtotal = document.getElementById('sum-subtotal');
+  const sumDelivery = document.getElementById('sum-delivery');
+
+  /** Typed field lookup — every id below is a control rendered by this page. */
+  const field = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const money = (n: number, lang: 'ar' | 'en') =>
+    `${n.toLocaleString('en-US')} ${labels.unit[lang]}`;
+
+  const validLines = () => readCart().filter((l) => byslug.has(l.slug));
+
+  function renderSummary() {
+    if (!emptyEl || !mainEl || !sumLines || !sumTotal) return;
+    const lang = getLang();
+    const lines = validLines();
+
+    emptyEl.hidden = lines.length > 0;
+    mainEl.hidden = lines.length === 0;
+    sumLines.innerHTML = '';
+    if (!lines.length) return;
+
+    let total = 0;
+    for (const line of lines) {
+      const p = byslug.get(line.slug)!;
+      const sub = p.price * line.qty;
+      total += sub;
+      const li = document.createElement('li');
+      li.innerHTML =
+        `<span class="s-name">${lang === 'ar' ? p.ar : p.en}` +
+        `<span class="s-qty"> × ${line.qty}</span></span>` +
+        `<span class="s-sub price">${money(sub, lang)}</span>`;
+      sumLines.appendChild(li);
+    }
+    if (sumSubtotal) sumSubtotal.textContent = money(total, lang);
+    if (sumDelivery) sumDelivery.textContent = money(DELIVERY_FEE_IQD, lang);
+    sumTotal.textContent = money(total + DELIVERY_FEE_IQD, lang);
+  }
+
+  // --- validation ----------------------------------------------------------
+  function showError(id: string, message: string | null) {
+    const el = document.getElementById(id);
+    const input = document.getElementById(id.replace('e-', 'f-'));
+    if (!el) return;
+    el.textContent = message ?? '';
+    el.hidden = !message;
+    input?.setAttribute('aria-invalid', message ? 'true' : 'false');
+    if (message) input?.setAttribute('aria-describedby', id);
+  }
+
+  function validate(): boolean {
+    const lang = getLang();
+    let ok = true;
+
+    const name = field<HTMLInputElement>('f-name').value.trim();
+    showError('e-name', name ? null : labels.required[lang]);
+    if (!name) ok = false;
+
+    const phoneRaw = field<HTMLInputElement>('f-phone').value;
+    const phoneOk = PHONE_RE.test(normalizePhone(phoneRaw));
+    showError('e-phone', phoneOk ? null : labels.phoneError[lang]);
+    if (!phoneOk) ok = false;
+
+    const gov = field<HTMLSelectElement>('f-gov').value;
+    showError('e-gov', gov ? null : labels.required[lang]);
+    if (!gov) ok = false;
+
+    const address = field<HTMLTextAreaElement>('f-address').value.trim();
+    showError('e-address', address ? null : labels.required[lang]);
+    if (!address) ok = false;
+
+    return ok;
+  }
+
+  /** Builds the wa.me fallback link so a failed request never loses the lead. */
+  function buildWhatsAppFallback(): string {
+    const name = field<HTMLInputElement>('f-name').value.trim();
+    const phone = normalizePhone(field<HTMLInputElement>('f-phone').value);
+    const gov = field<HTMLSelectElement>('f-gov').value;
+    const address = field<HTMLTextAreaElement>('f-address').value.trim();
+
+    const lines = validLines();
+    let total = 0;
+    const items = lines.map((l) => {
+      const p = byslug.get(l.slug)!;
+      const sub = p.price * l.qty;
+      total += sub;
+      return `• ${p.ar} — ${p.sp} ×${l.qty} = ${sub.toLocaleString('en-US')} IQD`;
+    });
+
+    const body = [
+      'طلب من موقع SHM',
+      '',
+      `الاسم: ${name}`,
+      `الهاتف: ${phone}`,
+      `المحافظة: ${gov}`,
+      `العنوان: ${address}`,
+      '',
+      'المنتجات:',
+      ...items,
+      '',
+      `التوصيل: ${DELIVERY_FEE_IQD.toLocaleString('en-US')} IQD`,
+      `المجموع: ${(total + DELIVERY_FEE_IQD).toLocaleString('en-US')} IQD`,
+    ].join('\n');
+
+    return `https://wa.me/${waNumber}?text=${encodeURIComponent(body)}`;
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validate() || !submitBtn) return;
+
+    const lang = getLang();
+    const honeypot = field<HTMLInputElement>('f-company').value;
+
+    const payload = {
+      name: field<HTMLInputElement>('f-name').value.trim(),
+      phone: normalizePhone(field<HTMLInputElement>('f-phone').value),
+      governorate: field<HTMLSelectElement>('f-gov').value,
+      address: field<HTMLTextAreaElement>('f-address').value.trim(),
+      items: validLines(),
+      company: honeypot,
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = labels.sending[lang];
+    if (failure) failure.hidden = true;
+
+    try {
+      const res = await fetch('/api/order', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      // Hand the summary to the success page before the cart is cleared.
+      try {
+        sessionStorage.setItem(
+          'shm.lastOrder',
+          JSON.stringify({ items: payload.items, governorate: payload.governorate }),
+        );
+      } catch {
+        /* non-critical */
+      }
+      clearCart();
+      window.location.href = '/order-received';
+    } catch {
+      // Keep the cart, show the error, offer WhatsApp with the order prefilled.
+      submitBtn.disabled = false;
+      submitBtn.textContent = labels.submit[lang];
+      if (failure && waFallback) {
+        waFallback.href = buildWhatsAppFallback();
+        failure.hidden = false;
+        failure.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  });
+
+  document.addEventListener('shm:langchange', renderSummary);
+  renderSummary();
+</script>
+
+<style>
+  .page { padding-block: var(--s7) var(--s8); }
+  .title { font-size: var(--fs-3xl); margin-block-end: var(--s6); text-align: start; }
+  .empty { color: var(--gray-700); margin-block-end: var(--s5); text-align: start; }
+
+  .cols { display: grid; gap: var(--s7); }
+
+  .field { margin-block-end: var(--s5); }
+
+  label {
+    display: block;
+    margin-block-end: var(--s2);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    text-align: start;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: var(--s4);
+    font: inherit;
+    font-size: var(--fs-base);
+    color: var(--navy);
+    background: var(--white);
+    border: 1.5px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    min-height: 52px;
+    text-align: start;
+  }
+  textarea { resize: vertical; line-height: 1.6; }
+  input:focus,
+  select:focus,
+  textarea:focus { border-color: var(--navy); }
+  input[aria-invalid='true'],
+  select[aria-invalid='true'],
+  textarea[aria-invalid='true'] { border-color: var(--error); }
+
+  .err {
+    margin-block-start: var(--s2);
+    font-size: var(--fs-sm);
+    color: var(--error);
+    text-align: start;
+  }
+
+  .hp {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .submit { width: 100%; }
+
+  .failure {
+    margin-block-start: var(--s5);
+    padding: var(--s4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--gray-50);
+  }
+  .failtext {
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+    margin-block-end: var(--s4);
+    line-height: 1.7;
+    text-align: start;
+  }
+  .failure .btn { width: 100%; }
+
+  .summary {
+    padding: var(--s5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--gray-50);
+    align-self: start;
+  }
+  .sum-title {
+    font-size: var(--fs-base);
+    margin-block-end: var(--s4);
+    text-align: start;
+  }
+  .sumlines { display: grid; gap: var(--s3); }
+  :global(.sumlines li) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: var(--fs-sm);
+    text-align: start;
+  }
+  :global(.s-qty) { color: var(--gray-500); }
+  :global(.s-sub) { white-space: nowrap; }
+
+  .summinor {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+  }
+  .summinor:first-of-type {
+    margin-block-start: var(--s5);
+    padding-block-start: var(--s4);
+    border-block-start: 1px solid var(--border);
+  }
+  .summinor + .summinor { margin-block-start: var(--s2); }
+
+  .sumtotal {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    margin-block-start: var(--s3);
+    padding-block-start: var(--s3);
+    border-block-start: 1px solid var(--border);
+    font-weight: 600;
+    font-size: var(--fs-lg);
+  }
+
+  .cod {
+    margin-block-start: var(--s4);
+    font-size: var(--fs-xs);
+    color: var(--gray-700);
+    line-height: 1.7;
+    text-align: start;
+  }
+
+  @media (min-width: 860px) {
+    .cols { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: var(--s8); }
+    .submit { width: auto; min-width: 220px; }
+  }
+</style>

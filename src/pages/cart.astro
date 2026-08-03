@@ -1,0 +1,323 @@
+---
+import Layout from '../layouts/Layout.astro';
+import T from '../components/T.astro';
+import { products, heroFor } from '../lib/catalog';
+import { getImage } from 'astro:assets';
+import { t } from '../i18n/strings';
+
+// Cart lines are slugs + quantities in localStorage; the page needs a small
+// lookup table to render names, prices and thumbnails without a round trip.
+const thumbs = Object.fromEntries(
+  await Promise.all(
+    products.map(async (p) => [
+      p.slug,
+      (await getImage({ src: heroFor(p.slug), width: 160, format: 'webp', quality: 72 })).src,
+    ]),
+  ),
+);
+
+const table = products.map((p) => ({
+  slug: p.slug,
+  ar: p.name_ar,
+  en: p.name_en,
+  sp: p.spec_line_en,
+  price: p.price_iqd,
+  img: thumbs[p.slug],
+}));
+
+const labels = {
+  qty: { ar: t['cart.qty'].ar, en: t['cart.qty'].en },
+  remove: { ar: t['cart.remove'].ar, en: t['cart.remove'].en },
+  increase: { ar: t['cart.increase'].ar, en: t['cart.increase'].en },
+  decrease: { ar: t['cart.decrease'].ar, en: t['cart.decrease'].en },
+  unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
+};
+---
+
+<Layout
+  titleAr="السلة — SHM"
+  titleEn="Cart — SHM"
+  descAr="مراجعة الطلب قبل الإرسال. الدفع عند الاستلام."
+  descEn="Review your order before sending. Cash on delivery."
+  canonicalPath="/cart/"
+  noindex>
+  <div class="wrap page">
+    <h1 class="title"><T k="cart.title" /></h1>
+
+    <div id="cart-empty" hidden>
+      <p class="empty"><T k="cart.empty" /></p>
+      <a class="btn btn-secondary" href="/"><T k="cart.continue" /></a>
+    </div>
+
+    <div id="cart-filled" hidden>
+      <ul class="lines" id="cart-lines"></ul>
+
+      <div class="totals">
+        <div class="row minor">
+          <span><T k="cart.subtotal" /></span>
+          <span id="cart-subtotal"></span>
+        </div>
+        <div class="row minor">
+          <span><T k="cart.delivery" /></span>
+          <span id="cart-delivery"></span>
+        </div>
+        <div class="row grand">
+          <span class="label"><T k="cart.total" /></span>
+          <span class="price total" id="cart-total"></span>
+        </div>
+        <p class="cod"><T k="cart.codNote" /></p>
+        <a class="btn btn-primary checkout" href="/checkout"><T k="cart.checkout" /></a>
+        <a class="continue" href="/"><T k="cart.continue" /></a>
+      </div>
+    </div>
+  </div>
+
+  <script is:inline type="application/json" id="product-table" set:html={JSON.stringify(table)} />
+  <script is:inline type="application/json" id="cart-labels" set:html={JSON.stringify(labels)} />
+</Layout>
+
+<script>
+  import { readCart, setQty, removeFromCart } from '../scripts/cart';
+  import { getLang } from '../scripts/i18n';
+  import { DELIVERY_FEE_IQD } from '../lib/order-shared';
+
+  type Row = { slug: string; ar: string; en: string; sp: string; price: number; img: string };
+
+  const table: Row[] = JSON.parse(
+    document.getElementById('product-table')?.textContent || '[]',
+  );
+  const labels = JSON.parse(document.getElementById('cart-labels')?.textContent || '{}');
+  const byslug = new Map(table.map((r) => [r.slug, r]));
+
+  const emptyEl = document.getElementById('cart-empty');
+  const filledEl = document.getElementById('cart-filled');
+  const listEl = document.getElementById('cart-lines');
+  const totalEl = document.getElementById('cart-total');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  const deliveryEl = document.getElementById('cart-delivery');
+
+  const money = (n: number, lang: 'ar' | 'en') =>
+    `${n.toLocaleString('en-US')} ${labels.unit[lang]}`;
+
+  function render() {
+    if (!listEl || !emptyEl || !filledEl || !totalEl) return;
+    const lang = getLang();
+    // Drop any slug that no longer exists in the catalog.
+    const lines = readCart().filter((l) => byslug.has(l.slug));
+
+    emptyEl.hidden = lines.length > 0;
+    filledEl.hidden = lines.length === 0;
+    listEl.innerHTML = '';
+    if (!lines.length) return;
+
+    let total = 0;
+    for (const line of lines) {
+      const p = byslug.get(line.slug)!;
+      const sub = p.price * line.qty;
+      total += sub;
+
+      const li = document.createElement('li');
+      li.className = 'line';
+      li.innerHTML = `
+        <a class="thumb" href="/product/${p.slug}">
+          <img src="${p.img}" alt="${p.en}" width="80" height="80" loading="lazy" />
+        </a>
+        <div class="info">
+          <a class="lname" href="/product/${p.slug}">${lang === 'ar' ? p.ar : p.en}</a>
+          <p class="spec-line">${p.sp}</p>
+          <p class="unit price">${money(p.price, lang)}</p>
+        </div>
+        <div class="controls">
+          <div class="qty">
+            <button type="button" class="step" data-act="dec" data-slug="${p.slug}"
+              aria-label="${labels.decrease[lang]}">−</button>
+            <span class="n" aria-label="${labels.qty[lang]}">${line.qty}</span>
+            <button type="button" class="step" data-act="inc" data-slug="${p.slug}"
+              aria-label="${labels.increase[lang]}">+</button>
+          </div>
+          <p class="sub price">${money(sub, lang)}</p>
+          <button type="button" class="rm" data-act="rm" data-slug="${p.slug}"
+            aria-label="${labels.remove[lang]}">${labels.remove[lang]}</button>
+        </div>
+      `;
+      listEl.appendChild(li);
+    }
+
+    // Delivery is a flat charge the customer pays; the server charges the
+    // same amount, so what they see here is what they get asked for.
+    if (subtotalEl) subtotalEl.textContent = money(total, lang);
+    if (deliveryEl) deliveryEl.textContent = money(DELIVERY_FEE_IQD, lang);
+    totalEl.textContent = money(total + DELIVERY_FEE_IQD, lang);
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-act]');
+    if (!btn) return;
+    const slug = btn.dataset.slug!;
+    const current = readCart().find((l) => l.slug === slug)?.qty ?? 0;
+    if (btn.dataset.act === 'inc') setQty(slug, current + 1);
+    if (btn.dataset.act === 'dec') setQty(slug, current - 1);
+    if (btn.dataset.act === 'rm') removeFromCart(slug);
+    render();
+  });
+
+  document.addEventListener('shm:langchange', render);
+  render();
+</script>
+
+<style>
+  .page { padding-block: var(--s7) var(--s8); }
+  .title { font-size: var(--fs-3xl); margin-block-end: var(--s6); text-align: start; }
+
+  .empty {
+    color: var(--gray-700);
+    margin-block-end: var(--s5);
+    text-align: start;
+  }
+
+  .lines { display: grid; gap: var(--s4); }
+
+  :global(.line) {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    grid-template-areas:
+      'thumb info'
+      'controls controls';
+    gap: var(--s3) var(--s4);
+    align-items: center;
+    padding: var(--s4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  /* Quantity, line total and remove share one wrapping row, so a long total
+     can never push the card past the viewport on a narrow phone. */
+  :global(.line .controls) {
+    grid-area: controls;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s3);
+    flex-wrap: wrap;
+  }
+
+  :global(.line .thumb) {
+    grid-area: thumb;
+    align-self: start;
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--navy);
+  }
+  :global(.line .thumb img) { width: 100%; height: 100%; object-fit: contain; }
+
+  :global(.line .info) { grid-area: info; min-width: 0; text-align: start; }
+  :global(.line .lname) { font-weight: 600; display: block; }
+  :global(.line .lname:hover) { text-decoration: underline; }
+  :global(.line .unit) { margin-block-start: var(--s2); font-size: var(--fs-sm); }
+
+  :global(.line .qty) {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    width: fit-content;
+  }
+  :global(.line .step) {
+    /* 44px minimum tap target. */
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-lg);
+    cursor: pointer;
+    color: var(--navy);
+  }
+  :global(.line .step:hover) { background: var(--gray-50); }
+  :global(.line .n) {
+    min-width: 24px;
+    text-align: center;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  :global(.line .sub) {
+    font-size: var(--fs-base);
+    text-align: end;
+    white-space: nowrap;
+    margin-inline-start: auto;
+  }
+
+  :global(.line .rm) {
+    border: 0;
+    background: none;
+    padding-inline: var(--s3);
+    min-height: 44px;
+    min-width: 44px;
+    color: var(--gray-700);
+    font-size: var(--fs-sm);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  :global(.line .rm:hover) { color: var(--navy); }
+
+  .totals {
+    margin-block-start: var(--s7);
+    padding-block-start: var(--s5);
+    border-block-start: 1px solid var(--border);
+  }
+  .row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4);
+  }
+  .row.minor {
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+    margin-block-end: var(--s3);
+  }
+  .row.grand {
+    padding-block-start: var(--s4);
+    border-block-start: 1px solid var(--border);
+  }
+  .label { font-size: var(--fs-lg); font-weight: 600; }
+  .total { font-size: var(--fs-2xl); }
+
+  .cod {
+    margin-block-start: var(--s4);
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+    line-height: 1.7;
+    text-align: start;
+  }
+
+  .checkout { width: 100%; margin-block-start: var(--s5); }
+  .continue {
+    display: block;
+    margin-block-start: var(--s4);
+    text-align: center;
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+    text-decoration: underline;
+    min-height: 44px;
+    line-height: 44px;
+  }
+
+  @media (min-width: 700px) {
+    :global(.line) {
+      grid-template-columns: 88px minmax(0, 1fr) auto;
+      grid-template-areas: 'thumb info controls';
+      gap: var(--s5);
+    }
+    :global(.line .controls) {
+      flex-wrap: nowrap;
+      gap: var(--s5);
+    }
+    :global(.line .sub) { min-width: 8ch; }
+    .totals { max-width: 380px; margin-inline-start: auto; }
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { categories, productsInCategory } from '../../lib/catalog';
+
+export function getStaticPaths() {
+  return categories.map((cat) => ({
+    params: { slug: cat.slug },
+    props: { cat },
+  }));
+}
+
+const { cat } = Astro.props;
+const items = productsInCategory(cat.slug);
+const ogImage = `/og/${cat.tile_product}.jpg`;
+---
+
+<Layout
+  titleAr={`${cat.name_ar} — SHM`}
+  titleEn={`${cat.name_en} — SHM`}
+  descAr={`${cat.name_ar} بعلامة Natra — ستانلس ستيل بعلامة CE، نفحص كل قطعة قبل الشحن.`}
+  descEn={`Natra ${cat.name_en} — CE-marked stainless steel, QC-tested before shipping.`}
+  canonicalPath={`/category/${cat.slug}/`}
+  ogImage={ogImage}>
+  <div class="wrap page">
+    <header class="head" data-reveal="fade">
+      <h1 class="title-ar" lang="ar" dir="rtl">{cat.name_ar}</h1>
+      <p class="title-en" lang="en" dir="ltr">{cat.name_en}</p>
+    </header>
+
+    <ul class="grid">
+      {items.map((p, i) => (
+        <li data-reveal data-reveal-delay={(i % 3) * 80}>
+          <ProductCard product={p} eager={i < 2} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</Layout>
+
+<style>
+  .page { padding-block: var(--s7) var(--s8); }
+
+  .head { margin-block-end: var(--s6); }
+
+  .title-ar {
+    font-size: var(--fs-3xl);
+    font-family: var(--font-ar);
+    text-align: start;
+  }
+  .title-en {
+    margin-block-start: var(--s1);
+    font-family: var(--font-en);
+    font-size: var(--fs-base);
+    color: var(--gray-500);
+    text-align: start;
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--s5);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 560px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(3, 1fr); gap: var(--s6); }
+  }
+</style>

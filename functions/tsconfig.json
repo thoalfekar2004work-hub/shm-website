@@ -1,0 +1,16 @@
+{
+  // The Pages Function runs on the Workers runtime, not in a browser. Its
+  // globals are kept in this scope so they cannot leak into the client code
+  // in src/, where they would conflict with the DOM lib.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["@cloudflare/workers-types"],
+    "strict": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["**/*.ts", "../src/lib/order-shared.ts", "../src/data/*.json"]
+}

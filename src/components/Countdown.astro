@@ -1,0 +1,112 @@
+---
+/**
+ * Counts down to a real, fixed moment in time.
+ *
+ * Deliberately not an evergreen "resets when you reload" timer: the target is
+ * a single timestamp from the product data, and when it passes the whole offer
+ * — badge, struck-through price and this clock — removes itself from the page.
+ * A countdown that never actually ends is a lie to the customer and, for this
+ * buyer, a fast way to lose the sale.
+ */
+import { t } from '../i18n/strings';
+
+interface Props {
+  /** ISO 8601 with offset. */
+  ends: string;
+  class?: string;
+}
+
+const { ends, class: cls } = Astro.props;
+const iso = new Date(ends).toISOString();
+
+const units = [
+  { key: 'd', label: t['time.days'] },
+  { key: 'h', label: t['time.hours'] },
+  { key: 'm', label: t['time.minutes'] },
+  { key: 's', label: t['time.seconds'] },
+] as const;
+---
+
+<div class:list={['countdown', cls]} data-countdown={iso} role="timer">
+  <span class="cd-lead">
+    <span data-t="ar">{t['product.offerEnds'].ar}</span><span data-t="en"
+      >{t['product.offerEnds'].en}</span>
+  </span>
+  <span class="cd-clock" dir="ltr">
+    {units.map(({ key, label }, i) => (
+      <>
+        {i > 0 && <span class="cd-sep" aria-hidden="true">:</span>}
+        <span class="cd-unit">
+          <span class="cd-num" data-cd={key}>--</span>
+          <span class="cd-label">
+            <span data-t="ar">{label.ar}</span><span data-t="en">{label.en}</span>
+          </span>
+        </span>
+      </>
+    ))}
+  </span>
+</div>
+
+<style>
+  .countdown {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2) var(--s3);
+  }
+
+  .cd-lead {
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--gray-700);
+  }
+
+  .cd-clock {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 2px;
+    /* Digits read left-to-right in both languages. */
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  .cd-unit {
+    display: inline-grid;
+    justify-items: center;
+    gap: 2px;
+    min-width: 42px;
+    padding: 4px var(--s2);
+    border-radius: var(--radius-sm);
+    background: var(--navy);
+    color: var(--white);
+  }
+
+  .cd-num {
+    font-family: var(--font-en);
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cd-label {
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: rgb(255 255 255 / 70%);
+    white-space: nowrap;
+  }
+
+  .cd-sep {
+    align-self: center;
+    padding-block-end: 12px;
+    color: var(--gray-500);
+    font-weight: 700;
+  }
+
+  /* On the navy showcase / dark surfaces the chips need to invert. */
+  :global(.on-navy) .cd-lead { color: rgb(255 255 255 / 80%); }
+  :global(.on-navy) .cd-unit {
+    background: rgb(255 255 255 / 12%);
+  }
+  :global(.on-navy) .cd-sep { color: rgb(255 255 255 / 45%); }
+</style>

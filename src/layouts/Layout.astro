@@ -1,0 +1,112 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_URL } from '../i18n/strings';
+
+interface Props {
+  /** Arabic page title — Arabic is the served default. */
+  titleAr: string;
+  titleEn: string;
+  descAr: string;
+  descEn: string;
+  /** Overrides og:title when the unfurl headline differs from the page title. */
+  ogTitle?: string;
+  /** Absolute or root-relative URL of the social preview image. */
+  ogImage?: string;
+  ogImageAlt?: string;
+  canonicalPath: string;
+  noindex?: boolean;
+}
+
+const {
+  titleAr,
+  titleEn,
+  descAr,
+  descEn,
+  ogTitle,
+  ogImage,
+  ogImageAlt,
+  canonicalPath,
+  noindex,
+} = Astro.props;
+
+const canonical = new URL(canonicalPath, SITE_URL).href;
+const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-default.jpg', SITE_URL).href;
+---
+
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#111E34" />
+
+    <title data-page-title-ar={titleAr} data-page-title-en={titleEn}>{titleAr}</title>
+    <meta name="description" content={descAr} data-desc-ar={descAr} data-desc-en={descEn} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <link rel="preload" href="/fonts/plex-arabic-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SHM" />
+    <meta property="og:locale" content="ar_IQ" />
+    <meta property="og:title" content={ogTitle ?? titleAr} />
+    <meta property="og:description" content={descAr} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    {ogImageAlt && <meta property="og:image:alt" content={ogImageAlt} />}
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <slot name="head" />
+
+    <script is:inline>
+      // Apply the saved language before first paint so nothing flashes.
+      (function () {
+        try {
+          var l = localStorage.getItem('shm.lang');
+          if (l === 'en') {
+            document.documentElement.setAttribute('lang', 'en');
+            document.documentElement.setAttribute('dir', 'ltr');
+          }
+        } catch (e) {}
+      })();
+    </script>
+
+    <style is:global>
+      /* Show only the active language. */
+      html[lang='ar'] [data-t='en'] { display: none; }
+      html[lang='en'] [data-t='ar'] { display: none; }
+    </style>
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">
+      <span data-t="ar">تخطَّ إلى المحتوى</span><span data-t="en">Skip to content</span>
+    </a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import { initLangToggle } from '../scripts/i18n';
+      import { initCartBadge } from '../scripts/cart';
+      import { initMotion } from '../scripts/motion';
+      import { initCountdowns } from '../scripts/promo';
+      initLangToggle();
+      initCartBadge();
+      initMotion();
+      initCountdowns();
+    </script>
+  </body>
+</html>

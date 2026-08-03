@@ -1,0 +1,366 @@
+[
+  {
+    "slug": "iris-scissors-red-curved",
+    "category": "scissors",
+    "name_en": "Iris Scissors — Red Curved",
+    "name_ar": "مقص آيرس أحمر منحني",
+    "spec_line_en": "Iris Scissors 12cm Curved — Natra",
+    "price_iqd": 30000,
+    "size": "12cm",
+    "variant_en": "Curved",
+    "variant_ar": "منحني",
+    "specs_en": [
+      "Size: 12cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Curved tip for precise reach in small, delicate areas.",
+    "benefit_ar": "منحني للوصول الأدق بالمناطق الصغيرة.",
+    "in_stock": true,
+    "low_stock": false,
+    "best_seller": true,
+    "is_set": false,
+    "sort": 10
+  },
+  {
+    "slug": "iris-scissors-straight",
+    "category": "scissors",
+    "name_en": "Iris Scissors — Straight",
+    "name_ar": "مقص آيرس مستقيم",
+    "spec_line_en": "Iris Scissors 12cm Straight — Natra",
+    "price_iqd": 20000,
+    "size": "12cm",
+    "variant_en": "Straight",
+    "variant_ar": "مستقيم",
+    "specs_en": [
+      "Size: 12cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Higher control for fine, precise cutting.",
+    "benefit_ar": "تحكم أعلى وقص أدق.",
+    "in_stock": true,
+    "low_stock": false,
+    "best_seller": true,
+    "is_set": false,
+    "sort": 20
+  },
+  {
+    "slug": "iris-scissors-curved",
+    "category": "scissors",
+    "name_en": "Iris Scissors — Curved",
+    "name_ar": "مقص آيرس منحني",
+    "spec_line_en": "Iris Scissors 12cm Curved — Natra",
+    "price_iqd": 20000,
+    "size": "12cm",
+    "variant_en": "Curved",
+    "variant_ar": "منحني",
+    "specs_en": [
+      "Size: 12cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Curved tip for precise reach in small, delicate areas.",
+    "benefit_ar": "منحني للوصول الأدق بالمناطق الصغيرة.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 30
+  },
+  {
+    "slug": "iris-scissors-rainbow",
+    "category": "scissors",
+    "name_en": "Iris Scissors — Rainbow",
+    "name_ar": "مقص آيرس رينبو",
+    "spec_line_en": "Iris Scissors 12cm Rainbow — Natra",
+    "price_iqd": 30000,
+    "size": "12cm",
+    "variant_en": "Rainbow",
+    "variant_ar": "رينبو",
+    "specs_en": [
+      "Size: 12cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Color-coated finish for fast visual identification in a tray.",
+    "benefit_ar": "طلاء ملون يسهل تمييزه بسرعة بين الأدوات.",
+    "in_stock": true,
+    "low_stock": true,
+    "best_seller": true,
+    "is_set": false,
+    "sort": 50
+  },
+  {
+    "slug": "mayo-scissors-curved",
+    "category": "scissors",
+    "name_en": "Mayo Scissors — Curved",
+    "name_ar": "مقص مايو منحني",
+    "spec_line_en": "Mayo Scissors 12cm Curved — Natra",
+    "price_iqd": 30000,
+    "size": "12cm",
+    "variant_en": "Curved",
+    "variant_ar": "منحني",
+    "specs_en": [
+      "Size: 12cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Heavier blade built for cutting tissue and sutures.",
+    "benefit_ar": "شفرة أقوى مخصصة لقص الأنسجة والخيوط الجراحية.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 60
+  },
+  {
+    "slug": "metzenbaum-scissors-blunt-curved",
+    "category": "scissors",
+    "name_en": "Metzenbaum Scissors — Blunt Curved",
+    "name_ar": "مقص ميتزنباوم منحني كليل",
+    "spec_line_en": "Metzenbaum Scissors 12cm Blunt Curved — Natra",
+    "price_iqd": 30000,
+    "size": "12cm",
+    "variant_en": "Blunt, Curved",
+    "variant_ar": "منحني كليل",
+    "specs_en": [
+      "Size: 12cm",
+      "Blunt tip",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "طرف كليل",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Blunt curved tip for delicate tissue dissection.",
+    "benefit_ar": "طرف كليل ومنحني لتشريح دقيق للأنسجة.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 70
+  },
+  {
+    "slug": "needle-holder-halsey-tc-12-5cm",
+    "category": "needle-holders",
+    "name_en": "Halsey Needle Holder — TC",
+    "name_ar": "ماسك إبر هالسي TC",
+    "spec_line_en": "Halsey Needle Holder 12.5cm TC — Natra",
+    "price_iqd": 55000,
+    "size": "12.5cm",
+    "variant_en": "TC (Tungsten Carbide)",
+    "variant_ar": "TC",
+    "specs_en": [
+      "Size: 12.5cm",
+      "TC tips",
+      "Smooth lock",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12.5 سم",
+      "أطراف TC",
+      "قفل ناعم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "TC tips for a stronger, more stable grip on the needle.",
+    "benefit_ar": "أطراف TC لمسكة أقوى وثبات أعلى للإبرة.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 90
+  },
+  {
+    "slug": "forceps-curved",
+    "category": "forceps",
+    "name_en": "Forceps — Curved",
+    "name_ar": "فورسبس منحني",
+    "spec_line_en": "Forceps 12cm Curved — Natra",
+    "price_iqd": 20000,
+    "size": "12cm",
+    "variant_en": "Curved",
+    "variant_ar": "منحني",
+    "specs_en": [
+      "Size: 12cm",
+      "Non-slip grip",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "مسكة غير قابلة للانزلاق",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Aligned tips and non-slip grip for delicate tissue handling.",
+    "benefit_ar": "أطراف متطابقة ومسكة ثابتة لتعامل دقيق مع الأنسجة.",
+    "in_stock": true,
+    "low_stock": true,
+    "is_set": false,
+    "sort": 100
+  },
+  {
+    "slug": "forceps-adson-toothed-straight",
+    "category": "forceps",
+    "name_en": "Adson Toothed Forceps — Straight",
+    "name_ar": "ملقط أدسون المسنن مستقيم",
+    "spec_line_en": "Adson Toothed Forceps 12cm Straight — Natra",
+    "price_iqd": 25000,
+    "size": "12cm",
+    "variant_en": "Straight, Toothed",
+    "variant_ar": "مستقيم مسنن",
+    "specs_en": [
+      "Size: 12cm",
+      "Toothed tip",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 12 سم",
+      "طرف مسنن",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Toothed tip for a firm, secure hold on tissue.",
+    "benefit_ar": "طرف مسنن لمسكة ثابتة وآمنة على الأنسجة.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 120
+  },
+  {
+    "slug": "hemostat-kelly-15cm",
+    "category": "hemostats",
+    "name_en": "Kelly Hemostat",
+    "name_ar": "مشبك كيلي",
+    "spec_line_en": "Kelly Hemostat 15cm — Natra",
+    "price_iqd": 30000,
+    "size": "15cm",
+    "specs_en": [
+      "Size: 15cm",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "القياس: 15 سم",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Larger clamp built for controlling bigger vessels and tissue.",
+    "benefit_ar": "مشبك أكبر مخصص للسيطرة على الأوعية والأنسجة الكبيرة.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 150
+  },
+  {
+    "slug": "set-ent",
+    "category": "sets",
+    "name_en": "ENT Set — 3 Pieces",
+    "name_ar": "ست الأنف والأذن والحنجرة — 3 قطع",
+    "spec_line_en": "ENT Set — 3 Pieces — Natra",
+    "price_iqd": 100000,
+    "specialty_en": "ENT",
+    "specialty_ar": "أنف وأذن وحنجرة",
+    "specs_en": [
+      "3 pieces",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "3 قطع",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Three Natra instruments supplied together as one set.",
+    "benefit_ar": "ثلاث أدوات Natra تنباع سوية كست واحد.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": true,
+    "promo": {
+      "was_iqd": 110000,
+      "ends": "2026-08-10T21:00:00+03:00"
+    },
+    "_note": "EXAMPLE OFFER — confirm or delete before sharing the site. was_iqd 110,000 comes from your own set graphic; the end date is a placeholder. Deleting the \"promo\" block removes the badge, the struck price and the countdown.",
+    "sort": 200
+  },
+  {
+    "slug": "set-general",
+    "category": "sets",
+    "name_en": "General Set — 3 Pieces",
+    "name_ar": "الست العام — 3 قطع",
+    "spec_line_en": "General Set — 3 Pieces — Natra",
+    "price_iqd": 80000,
+    "specs_en": [
+      "3 pieces",
+      "German stainless steel (Rostfrei)",
+      "CE marked",
+      "QC-tested before shipping"
+    ],
+    "specs_ar": [
+      "3 قطع",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE",
+      "نفحصه قبل الشحن"
+    ],
+    "benefit_en": "Three Natra instruments supplied together as one set.",
+    "benefit_ar": "ثلاث أدوات Natra تنباع سوية كست واحد.",
+    "in_stock": true,
+    "low_stock": false,
+    "is_set": true,
+    "promo": {
+      "was_iqd": 90000,
+      "ends": "2026-08-10T21:00:00+03:00"
+    },
+    "sort": 210
+  }
+]

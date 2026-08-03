@@ -1,0 +1,357 @@
+---
+import T from './T.astro';
+import { searchIndex, products } from '../lib/catalog';
+import { t } from '../i18n/strings';
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCatalog = path === '/' || path.startsWith('/category');
+const isSets = path.startsWith('/sets');
+
+// Small inlined index — name_ar + name_en + spec_line_en, per spec §4.
+const index = JSON.stringify(searchIndex);
+const priceUnit = { ar: t['price.unit'].ar, en: t['price.unit'].en };
+const noResults = { ar: t['search.noResults'].ar, en: t['search.noResults'].en };
+---
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="/" aria-label="SHM">
+      <img src="/shm-logo-navy.png" alt="SHM" width="278" height="353" />
+    </a>
+
+    <nav class="links" aria-label="Catalog">
+      <a href="/" class:list={['navlink', { active: isCatalog }]}
+        aria-current={isCatalog ? 'page' : undefined}><T k="nav.catalog" /></a>
+      <a href="/sets" class:list={['navlink', { active: isSets }]}
+        aria-current={isSets ? 'page' : undefined}><T k="nav.sets" /></a>
+    </nav>
+
+    <div class="actions">
+      <button
+        type="button"
+        class="iconbtn"
+        id="search-toggle"
+        aria-expanded="false"
+        aria-controls="search-panel"
+        data-arialabel-ar={t['nav.openSearch'].ar}
+        data-arialabel-en={t['nav.openSearch'].en}
+        aria-label={t['nav.openSearch'].ar}>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path>
+        </svg>
+      </button>
+
+      <a
+        href="/cart"
+        class="iconbtn cartbtn"
+        data-arialabel-ar={t['nav.cart'].ar}
+        data-arialabel-en={t['nav.cart'].en}
+        aria-label={t['nav.cart'].ar}>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 6h15l-1.6 8.2a2 2 0 0 1-2 1.6H9.3a2 2 0 0 1-2-1.6L5.2 3.5H3"></path>
+          <circle cx="9.5" cy="20" r="1.4"></circle><circle cx="17.5" cy="20" r="1.4"></circle>
+        </svg>
+        <span class="cartcount" data-cart-count hidden></span>
+      </a>
+
+      <button
+        type="button"
+        class="langbtn"
+        data-lang-toggle
+        data-arialabel-ar={t['nav.language'].ar}
+        data-arialabel-en={t['nav.language'].en}
+        aria-label={t['nav.language'].ar}>
+        <span data-t="ar">EN</span><span data-t="en">ع</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="searchpanel" id="search-panel" hidden>
+    <div class="wrap">
+      <input
+        type="search"
+        id="search-input"
+        autocomplete="off"
+        data-placeholder-ar={t['search.placeholder'].ar}
+        data-placeholder-en={t['search.placeholder'].en}
+        placeholder={t['search.placeholder'].ar}
+        data-arialabel-ar={t['search.placeholder'].ar}
+        data-arialabel-en={t['search.placeholder'].en}
+        aria-label={t['search.placeholder'].ar}
+      />
+      <ul id="search-results" class="results" role="listbox"></ul>
+    </div>
+  </div>
+</header>
+
+<script
+  is:inline
+  type="application/json"
+  id="search-index"
+  set:html={index}
+/>
+<script
+  is:inline
+  type="application/json"
+  id="search-labels"
+  set:html={JSON.stringify({ priceUnit, noResults })}
+/>
+
+<script>
+  import { getLang } from '../scripts/i18n';
+
+  const toggle = document.getElementById('search-toggle') as HTMLButtonElement | null;
+  const panel = document.getElementById('search-panel');
+  const input = document.getElementById('search-input') as HTMLInputElement | null;
+  const list = document.getElementById('search-results');
+  const indexEl = document.getElementById('search-index');
+  const labelEl = document.getElementById('search-labels');
+
+  if (toggle && panel && input && list && indexEl && labelEl) {
+    type Row = { s: string; ar: string; en: string; sp: string; p: number };
+    const index: Row[] = JSON.parse(indexEl.textContent || '[]');
+    const labels = JSON.parse(labelEl.textContent || '{}');
+
+    const open = () => {
+      panel.hidden = false;
+      toggle.setAttribute('aria-expanded', 'true');
+      input.focus();
+    };
+    const close = () => {
+      panel.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      input.value = '';
+      list.innerHTML = '';
+    };
+
+    toggle.addEventListener('click', () => (panel.hidden ? open() : close()));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) {
+        close();
+        toggle.focus();
+      }
+    });
+
+    // Arabic typing varies: normalise alef/ya/ta-marbuta and strip diacritics.
+    const norm = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/[ً-ٰٟ]/g, '')
+        .replace(/[أإآا]/g, 'ا')
+        .replace(/[ىي]/g, 'ي')
+        .replace(/ة/g, 'ه')
+        .replace(/ـ/g, '')
+        .trim();
+
+    input.addEventListener('input', () => {
+      const q = norm(input.value);
+      list.innerHTML = '';
+      if (q.length < 1) return;
+
+      const lang = getLang();
+      const hits = index
+        .filter((r) => norm(r.ar).includes(q) || norm(r.en).includes(q) || norm(r.sp).includes(q))
+        .slice(0, 8);
+
+      if (!hits.length) {
+        const li = document.createElement('li');
+        li.className = 'empty';
+        li.textContent = labels.noResults[lang];
+        list.appendChild(li);
+        return;
+      }
+
+      for (const r of hits) {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `/product/${r.s}`;
+        a.innerHTML =
+          `<span class="r-name">${lang === 'ar' ? r.ar : r.en}</span>` +
+          `<span class="r-spec">${r.sp}</span>` +
+          `<span class="r-price price">${r.p.toLocaleString('en-US')} ${labels.priceUnit[lang]}</span>`;
+        li.appendChild(a);
+        list.appendChild(li);
+      }
+    });
+
+    // Re-render results when the language flips mid-search.
+    document.addEventListener('shm:langchange', () => input.dispatchEvent(new Event('input')));
+  }
+</script>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--white);
+    border-block-end: 1px solid var(--border);
+    transition: box-shadow 220ms var(--ease), border-color 220ms var(--ease);
+    /* Safari repaints a sticky bar against whatever scrolled past it and can
+       leave the link text ghosted/half-drawn. Giving the bar its own
+       compositing layer makes it repaint as one unit. */
+    transform: translateZ(0);
+    will-change: transform;
+    /* Belt and braces: never let a stale paint bleed through the bar. */
+    isolation: isolate;
+  }
+  /* Lifts off the page once it starts overlapping content. */
+  .nav.scrolled {
+    box-shadow: 0 2px 14px rgb(17 30 52 / 8%);
+    border-block-end-color: transparent;
+  }
+
+  .nav-inner {
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+  .brand img {
+    height: 34px;
+    width: auto;
+  }
+
+  .links {
+    display: flex;
+    gap: var(--s5);
+    margin-inline-start: var(--s5);
+    flex: 1 1 auto;
+  }
+
+  .navlink {
+    position: relative;
+    padding-block: var(--s2);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    color: var(--navy);
+    white-space: nowrap;
+  }
+  /* Red underline on the active nav item — the one permitted decorative red
+     use, specified as brand behaviour (spec §4). */
+  .navlink.active::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -2px;
+    height: 2.5px;
+    background: var(--red);
+    border-radius: 2px;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--s1);
+    flex: 0 0 auto;
+  }
+
+  .iconbtn,
+  .langbtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-sm);
+    color: var(--navy);
+    cursor: pointer;
+    position: relative;
+  }
+  .iconbtn:hover,
+  .langbtn:hover { background: var(--gray-50); }
+
+  .langbtn {
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    padding-inline: var(--s3);
+    border: 1px solid var(--border);
+  }
+
+  .cartcount {
+    position: absolute;
+    inset-block-start: 6px;
+    inset-inline-end: 5px;
+    min-width: 17px;
+    height: 17px;
+    padding-inline: 4px;
+    border-radius: 999px;
+    /* Navy, not red: the badge is neither a price nor a primary CTA (§0.3). */
+    background: var(--navy);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 17px;
+    text-align: center;
+  }
+
+  .searchpanel {
+    border-block-start: 1px solid var(--border);
+    background: var(--white);
+    padding-block: var(--s4);
+  }
+  .searchpanel input {
+    width: 100%;
+    padding: var(--s4);
+    font: inherit;
+    font-size: var(--fs-base);
+    color: var(--navy);
+    border: 1.5px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    background: var(--gray-50);
+  }
+  .searchpanel input:focus {
+    background: var(--white);
+    border-color: var(--navy);
+  }
+
+  .results {
+    margin-block-start: var(--s3);
+    display: grid;
+    gap: 2px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  /* Result rows are built in the client script, so they never carry Astro's
+     scope attribute — these rules have to be global to reach them. */
+  .results :global(a) {
+    display: grid;
+    gap: 2px;
+    padding: var(--s3);
+    border-radius: var(--radius-sm);
+    text-align: start;
+  }
+  .results :global(a:hover) { background: var(--gray-50); }
+  .results :global(.r-name) { font-weight: 600; font-size: var(--fs-sm); }
+  .results :global(.r-spec) {
+    font-family: var(--font-en);
+    font-size: var(--fs-xs);
+    color: var(--gray-500);
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: start;
+  }
+  .results :global(.r-price) { font-size: var(--fs-sm); }
+  .results :global(.empty) {
+    padding: var(--s3);
+    color: var(--gray-500);
+    font-size: var(--fs-sm);
+    text-align: start;
+  }
+
+  @media (max-width: 420px) {
+    .links { margin-inline-start: var(--s3); gap: var(--s4); }
+    .nav-inner { gap: var(--s2); }
+  }
+</style>

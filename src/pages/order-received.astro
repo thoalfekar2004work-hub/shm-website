@@ -1,0 +1,176 @@
+---
+import Layout from '../layouts/Layout.astro';
+import T from '../components/T.astro';
+import { products } from '../lib/catalog';
+import { t, WHATSAPP_LINK, WHATSAPP_NUMBER } from '../i18n/strings';
+
+const table = products.map((p) => ({
+  slug: p.slug,
+  ar: p.name_ar,
+  en: p.name_en,
+  price: p.price_iqd,
+}));
+
+const labels = {
+  unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
+  total: { ar: t['cart.total'].ar, en: t['cart.total'].en },
+};
+---
+
+<Layout
+  titleAr="تم استلام طلبك — SHM"
+  titleEn="Order received — SHM"
+  descAr="تم استلام طلبك. راح نتواصل وياك على الواتساب لتأكيد الطلب قبل الشحن."
+  descEn="Order received. We'll message you on WhatsApp to confirm before shipping."
+  canonicalPath="/order-received/"
+  noindex>
+  <div class="wrap page">
+    <h1 class="title"><T k="success.title" /></h1>
+    <p class="body"><T k="success.body" /></p>
+
+    <section class="summary" id="summary" hidden>
+      <h2 class="sum-h"><T k="cart.summary" /></h2>
+      <ul id="sum-lines" class="sumlines"></ul>
+      <div class="summinor">
+        <span><T k="cart.delivery" /></span>
+        <span id="sum-delivery"></span>
+      </div>
+      <div class="sumtotal">
+        <span><T k="cart.total" /></span>
+        <span class="price" id="sum-total"></span>
+      </div>
+    </section>
+
+    <div class="actions">
+      <a class="btn btn-secondary" href="/"><T k="cart.continue" /></a>
+      <a class="wa" href={WHATSAPP_LINK} rel="noopener" dir="ltr">{WHATSAPP_NUMBER}</a>
+    </div>
+  </div>
+
+  <script is:inline type="application/json" id="product-table" set:html={JSON.stringify(table)} />
+  <script is:inline type="application/json" id="or-labels" set:html={JSON.stringify(labels)} />
+</Layout>
+
+<script>
+  import { getLang } from '../scripts/i18n';
+  import { DELIVERY_FEE_IQD } from '../lib/order-shared';
+
+  type Row = { slug: string; ar: string; en: string; price: number };
+  const table: Row[] = JSON.parse(document.getElementById('product-table')?.textContent || '[]');
+  const labels = JSON.parse(document.getElementById('or-labels')?.textContent || '{}');
+  const byslug = new Map(table.map((r) => [r.slug, r]));
+
+  const wrap = document.getElementById('summary');
+  const list = document.getElementById('sum-lines');
+  const totalEl = document.getElementById('sum-total');
+
+  function render() {
+    if (!wrap || !list || !totalEl) return;
+    let order: { items: { slug: string; qty: number }[] } | null = null;
+    try {
+      order = JSON.parse(sessionStorage.getItem('shm.lastOrder') || 'null');
+    } catch {
+      order = null;
+    }
+    const items = (order?.items ?? []).filter((i) => byslug.has(i.slug));
+    if (!items.length) {
+      wrap.hidden = true;
+      return;
+    }
+
+    const lang = getLang();
+    wrap.hidden = false;
+    list.innerHTML = '';
+    let total = 0;
+    for (const it of items) {
+      const p = byslug.get(it.slug)!;
+      const sub = p.price * it.qty;
+      total += sub;
+      const li = document.createElement('li');
+      li.innerHTML =
+        `<span>${lang === 'ar' ? p.ar : p.en}<span class="q"> × ${it.qty}</span></span>` +
+        `<span class="price">${sub.toLocaleString('en-US')} ${labels.unit[lang]}</span>`;
+      list.appendChild(li);
+    }
+    const deliveryEl = document.getElementById('sum-delivery');
+    if (deliveryEl) {
+      deliveryEl.textContent = `${DELIVERY_FEE_IQD.toLocaleString('en-US')} ${labels.unit[lang]}`;
+    }
+    totalEl.textContent =
+      `${(total + DELIVERY_FEE_IQD).toLocaleString('en-US')} ${labels.unit[lang]}`;
+  }
+
+  document.addEventListener('shm:langchange', render);
+  render();
+</script>
+
+<style>
+  .page {
+    padding-block: var(--s9) var(--s8);
+    max-width: 560px;
+  }
+  .title { font-size: var(--fs-3xl); text-align: start; }
+  .body {
+    margin-block-start: var(--s4);
+    font-size: var(--fs-lg);
+    color: var(--gray-700);
+    line-height: 1.7;
+    text-align: start;
+  }
+
+  .summary {
+    margin-block-start: var(--s7);
+    padding: var(--s5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--gray-50);
+  }
+  .sum-h { font-size: var(--fs-base); margin-block-end: var(--s4); text-align: start; }
+  .sumlines { display: grid; gap: var(--s3); }
+  :global(.sumlines li) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    font-size: var(--fs-sm);
+    text-align: start;
+  }
+  :global(.sumlines .q) { color: var(--gray-500); }
+
+  .summinor {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    margin-block-start: var(--s5);
+    padding-block-start: var(--s4);
+    border-block-start: 1px solid var(--border);
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+  }
+
+  .sumtotal {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s4);
+    margin-block-start: var(--s3);
+    padding-block-start: var(--s3);
+    border-block-start: 1px solid var(--border);
+    font-weight: 600;
+    font-size: var(--fs-lg);
+  }
+
+  .actions {
+    margin-block-start: var(--s7);
+    display: flex;
+    align-items: center;
+    gap: var(--s5);
+    flex-wrap: wrap;
+  }
+  .wa {
+    font-weight: 600;
+    color: var(--navy);
+    text-decoration: underline;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+</style>

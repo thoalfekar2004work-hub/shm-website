@@ -1,0 +1,123 @@
+/* SHM design tokens — spec §11 */
+
+@font-face {
+  font-family: 'Inter var';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/inter-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074,
+    U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/plex-arabic-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/plex-arabic-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Sans Arabic';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/plex-arabic-700.woff2') format('woff2');
+}
+
+:root {
+  /* Sampled from the navy brand asset (SHM logo card supplied with the
+     product photos): the dominant backdrop cluster measured #14233B/#0D1B33,
+     locked here at the midpoint. */
+  --navy: #111e34;
+  --navy-raised: #1b2a44;
+
+  --red: #e63946;
+  /* Same hue, darkened just enough that white label text on a solid fill
+     clears 4.5:1 (brand red alone measures 4.18:1). Used only as a button
+     background — the brand red above stays the value for prices, the active
+     nav underline, and borders. */
+  --red-cta: #dc2f3e;
+  --red-cta-hover: #c92433;
+
+  /* Form-error signal. Deliberately NOT the brand red: §0.3 reserves that for
+     prices, primary CTAs and the active-nav underline. This darker tone also
+     clears 4.5:1 as body text on white. */
+  --error: #b3202c;
+
+  --white: #ffffff;
+  --gray-50: #f7f8fa;
+  --gray-100: #eef0f4;
+  --gray-200: #dfe3ea;
+  --gray-500: #6b7688;
+  --gray-700: #3d4657;
+
+  --bg: var(--white);
+  --text: var(--navy);
+  --text-muted: var(--gray-500);
+  /* Decorative separators and card outlines. */
+  --border: var(--gray-200);
+  /* Form controls: a user has to be able to see where the field is, so this
+     one clears the 3:1 non-text contrast floor (WCAG 1.4.11) — 3.26:1. */
+  --border-input: #868fa0;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+
+  --shadow-sm: 0 1px 2px rgb(17 30 52 / 6%);
+  --shadow-md: 0 6px 20px rgb(17 30 52 / 10%);
+  --shadow-lg: 0 16px 48px rgb(17 30 52 / 16%);
+
+  /* generous spacing scale */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+  --s7: 48px;
+  --s8: 64px;
+  --s9: 96px;
+
+  --wrap: 1180px;
+  --nav-h: 60px;
+
+  --font-en: 'Inter var', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Plex Arabic covers the Arabic subset only; Inter picks up the Latin that
+     stays untranslated in Arabic mode (spec lines, prices, "Natra"). */
+  --font-ar: 'IBM Plex Sans Arabic', 'Inter var', 'Noto Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+
+  /* larger and airier than corporate-catalog density */
+  --fs-xs: 0.8125rem;
+  --fs-sm: 0.9375rem;
+  --fs-base: 1.0625rem;
+  --fs-lg: 1.1875rem;
+  --fs-xl: 1.4375rem;
+  --fs-2xl: 1.75rem;
+  --fs-3xl: 2.125rem;
+  --fs-4xl: 2.75rem;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+html[lang='en'] {
+  --font-body: var(--font-en);
+}
+html[lang='ar'] {
+  --font-body: var(--font-ar);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --nav-h: 72px;
+    --fs-4xl: 3.5rem;
+    --fs-3xl: 2.5rem;
+  }
+}
