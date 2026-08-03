@@ -505,7 +505,6 @@ shm-website/
 │   └── styles/tokens.css      colours, spacing, fonts
 ├── public/                    logos, icons, fonts, link previews
 ├── .dev.vars                  local secrets — never committed
-└── wrangler.toml
 ```
 
 Two things worth knowing:
