@@ -92,7 +92,7 @@ const units = [
   .cd-label {
     font-size: 10px;
     letter-spacing: 0.04em;
-    color: rgb(255 255 255 / 70%);
+    color: var(--white);
     white-space: nowrap;
   }
 
@@ -104,9 +104,9 @@ const units = [
   }
 
   /* On the navy showcase / dark surfaces the chips need to invert. */
-  :global(.on-navy) .cd-lead { color: rgb(255 255 255 / 80%); }
+  :global(.on-navy) .cd-lead { color: var(--white); }
   :global(.on-navy) .cd-unit {
     background: rgb(255 255 255 / 12%);
   }
-  :global(.on-navy) .cd-sep { color: rgb(255 255 255 / 45%); }
+  :global(.on-navy) .cd-sep { color: var(--white); }
 </style>

@@ -41,6 +41,10 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#111E34" />
+    <!-- The site has one deliberately light design; this stops browsers from
+         auto-darkening it (and mismatching our own colors) when the visitor's
+         OS/browser prefers dark. -->
+    <meta name="color-scheme" content="light" />
 
     <title data-page-title-ar={titleAr} data-page-title-en={titleEn}>{titleEn}</title>
     <meta name="description" content={descEn} data-desc-ar={descAr} data-desc-en={descEn} />

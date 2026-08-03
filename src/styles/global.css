@@ -7,6 +7,9 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* One deliberately light design — don't let the browser auto-darken it
+     (and mismatch our own colors) when the OS/browser prefers dark. */
+  color-scheme: light;
 }
 
 body {
