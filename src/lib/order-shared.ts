@@ -19,11 +19,26 @@ export const LIMITS = {
 export const DELIVERY_FEE_IQD = 5000;
 
 /**
- * Iraqi mobile numbers. Strips spaces, dashes and parentheses, converts a
- * +964 / 964 / 00964 prefix to a leading 0, then requires 07XXXXXXXXX.
+ * Iraqi keyboards default to Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩), so a phone
+ * number typed while the keyboard is in Arabic mode arrives full of those,
+ * not "0-9" — without this, a completely valid number fails validation for
+ * a reason no customer would ever guess. Extended Arabic-Indic (Persian/Urdu
+ * keyboards, ۰۱۲۳۴۵۶۷۸۹) is included too since it costs nothing to cover.
+ */
+function toWesternDigits(input: string): string {
+  return input.replace(/[٠-٩۰-۹]/g, (d) => {
+    const code = d.codePointAt(0)!;
+    return String(code >= 0x06f0 ? code - 0x06f0 : code - 0x0660);
+  });
+}
+
+/**
+ * Iraqi mobile numbers. Converts Arabic-Indic digits to Western, strips
+ * spaces, dashes and parentheses, converts a +964 / 964 / 00964 prefix to a
+ * leading 0, then requires 07XXXXXXXXX.
  */
 export function normalizePhone(input: string): string {
-  let s = String(input ?? '')
+  let s = toWesternDigits(String(input ?? ''))
     .replace(/[\s\-().]/g, '')
     .replace(/^\+/, '');
   if (s.startsWith('00964')) s = s.slice(5);
