@@ -7,6 +7,7 @@ import BestSellers from '../components/BestSellers.astro';
 import {
   categories,
   heroFor,
+  imagesFor,
   lowestPriceIn,
   productsInCategory,
   bySlug,
@@ -24,6 +25,23 @@ const tiles = categories.map((c) => ({
 
 const setsFrom = sets.reduce((min, s) => Math.min(min, s.price_iqd), Infinity);
 const setsTile = sets[0];
+
+/**
+ * Hero crossfade — the marking-macro shot from four instruments, picked for
+ * the brushed-steel-on-navy "Natra" close-up rather than a generic hero shot.
+ * Last image in each folder is that macro shot (see ingest-images.mjs).
+ */
+function lastImage(slug: string) {
+  const list = imagesFor(slug);
+  if (!list.length) throw new Error(`[hero] no images for "${slug}"`);
+  return list[list.length - 1];
+}
+const HERO_PHOTOS = [
+  'needle-holder-halsey-tc-12-5cm',
+  'iris-scissors-red-curved',
+  'iris-scissors-straight',
+  'mayo-scissors-curved',
+].map(lastImage);
 ---
 
 <Layout
@@ -34,11 +52,31 @@ const setsTile = sets[0];
   canonicalPath="/"
   ogImage="/og-default.jpg">
   <section class="hero">
-    <div class="wrap">
-      <h1 class="h1 hero-en enter enter-1" lang="en" dir="ltr">{HERO_LINE_1}</h1>
-      <p class="h2 hero-en enter enter-2" lang="en" dir="ltr">{HERO_LINE_2}</p>
-      <p class="h3 hero-ar enter enter-3" lang="ar" dir="rtl">{HERO_LINE_3_AR}</p>
-      <a class="btn btn-primary hero-cta enter enter-4" href="#catalog"><T k="hero.cta" /></a>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <h1 class="h1 hero-en enter enter-1" lang="en" dir="ltr">{HERO_LINE_1}</h1>
+        <p class="h2 hero-en enter enter-2" lang="en" dir="ltr">{HERO_LINE_2}</p>
+        <p class="h3 hero-ar enter enter-3" lang="ar" dir="rtl">{HERO_LINE_3_AR}</p>
+        <a class="btn btn-primary hero-cta enter enter-4" href="#catalog"><T k="hero.cta" /></a>
+      </div>
+
+      <div class="hero-photos enter enter-4" aria-hidden="true">
+        {HERO_PHOTOS.map((img, i) => (
+          <Image
+            src={img}
+            alt=""
+            data-slide={i}
+            data-active={i === 0 ? 'true' : 'false'}
+            width={640}
+            widths={[420, 640, 840]}
+            sizes="(min-width: 900px) 420px, 92vw"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : undefined}
+            format="webp"
+            quality={78}
+          />
+        ))}
+      </div>
     </div>
   </section>
 
@@ -116,9 +154,53 @@ const setsTile = sets[0];
   <BestSellers />
 </Layout>
 
+<script>
+  const panel = document.querySelector<HTMLElement>('.hero-photos');
+  if (panel) {
+    const slides = Array.from(panel.querySelectorAll<HTMLElement>('[data-slide]'));
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (slides.length > 1 && !reduced) {
+      let active = 0;
+      setInterval(() => {
+        slides[active].setAttribute('data-active', 'false');
+        active = (active + 1) % slides.length;
+        slides[active].setAttribute('data-active', 'true');
+      }, 5000);
+    }
+  }
+</script>
+
 <style>
   .hero {
     padding-block: var(--s8) var(--s7);
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: var(--s7);
+  }
+
+  .hero-photos {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--navy);
+  }
+  .hero-photos :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 600ms var(--ease);
+  }
+  .hero-photos :global(img[data-active='true']) {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-photos :global(img) { transition: none; }
   }
 
   .h1 {
@@ -225,6 +307,11 @@ const setsTile = sets[0];
   @media (min-width: 900px) {
     .grid { grid-template-columns: repeat(3, 1fr); gap: var(--s6); }
     .hero { padding-block: var(--s9) var(--s8); }
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+      align-items: center;
+      gap: var(--s9);
+    }
     .h1 { font-size: var(--fs-4xl); }
   }
 
