@@ -1,6 +1,6 @@
 ---
 import T from './T.astro';
-import { WHATSAPP_LINK, WHATSAPP_NUMBER, INSTAGRAM_URL, FACEBOOK_URL } from '../i18n/strings';
+import { WHATSAPP_LINK, WHATSAPP_NUMBER, INSTAGRAM_URL, FACEBOOK_URL, PROOF_POINTS } from '../i18n/strings';
 
 const year = new Date().getFullYear();
 ---
@@ -9,7 +9,15 @@ const year = new Date().getFullYear();
   <div class="wrap foot-inner">
     <div class="foot-brand">
       <img src="/shm-logo-white.png" alt="SHM" width="278" height="353" />
-      <p class="proof"><T k="proof.strip" /></p>
+      <ul class="proof">
+        {PROOF_POINTS.map((point) => (
+          <li>
+            <span aria-hidden="true">✅</span>
+            <span data-t="ar" lang="ar" dir="rtl">{point.ar}</span><span data-t="en" lang="en" dir="ltr"
+              >{point.en}</span>
+          </li>
+        ))}
+      </ul>
     </div>
 
     <div class="foot-contact">
@@ -70,9 +78,15 @@ const year = new Date().getFullYear();
   .proof {
     margin-block-start: var(--s4);
     max-width: 46ch;
+    display: grid;
+    gap: var(--s2);
     font-size: var(--fs-sm);
     color: var(--white);
-    line-height: 1.8;
+  }
+  .proof li {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
   }
 
   .foot-h {

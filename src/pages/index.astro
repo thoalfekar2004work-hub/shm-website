@@ -13,7 +13,14 @@ import {
   bySlug,
   sets,
 } from '../lib/catalog';
-import { HERO_LINE_1, HERO_LINE_2, HERO_LINE_1_AR, HERO_LINE_2_AR, formatPrice } from '../i18n/strings';
+import {
+  HERO_LINE_1,
+  HERO_LINE_2,
+  HERO_LINE_1_AR,
+  HERO_LINE_2_AR,
+  PROOF_POINTS,
+  formatPrice,
+} from '../i18n/strings';
 
 const tiles = categories.map((c) => ({
   cat: c,
@@ -86,7 +93,15 @@ const HERO_PHOTOS = [
   </section>
 
   <div class="proofstrip">
-    <div class="wrap"><T k="proof.strip" /></div>
+    <ul class="wrap proof-list">
+      {PROOF_POINTS.map((point) => (
+        <li>
+          <span aria-hidden="true">✅</span>
+          <span data-t="ar" lang="ar" dir="rtl">{point.ar}</span><span data-t="en" lang="en" dir="ltr"
+            >{point.en}</span>
+        </li>
+      ))}
+    </ul>
   </div>
 
   <Showcase />
@@ -236,7 +251,17 @@ const HERO_PHOTOS = [
     color: var(--white);
     font-size: var(--fs-sm);
     padding-block: var(--s4);
-    line-height: 1.7;
+  }
+
+  .proof-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s6);
+  }
+  .proof-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--s2);
   }
 
   .catalog {

@@ -24,6 +24,13 @@ export const FACEBOOK_URL = 'https://www.facebook.com/SHM.I0';
 
 export const SITE_URL = 'https://shm-website.pages.dev';
 
+/** The three trust claims shown as a checklist (proof strip, footer). */
+export const PROOF_POINTS: { ar: string; en: string }[] = [
+  { ar: 'نفحص كل قطعة قبل الشحن', en: 'QC on every piece before shipping' },
+  { ar: 'تبديل متوفر عند وجود خلل واضح', en: 'Exchange guarantee for clear defects' },
+  { ar: 'ستانلس ستيل بعلامة CE', en: 'CE-marked stainless steel' },
+];
+
 type Dict = Record<string, { ar: string; en: string }>;
 
 export const t: Dict = {
@@ -92,10 +99,6 @@ export const t: Dict = {
     en: "We'll message you on WhatsApp to confirm before shipping.",
   },
   'search.placeholder': { ar: 'دور على أداة...', en: 'Search instruments...' },
-  'proof.strip': {
-    ar: 'نفحص كل قطعة قبل الشحن · تبديل متوفر عند وجود خلل واضح · ستانلس ستيل بعلامة CE',
-    en: 'QC on every piece before shipping · Exchange guarantee for clear defects · CE-marked stainless steel',
-  },
   'price.unit': { ar: 'د.ع', en: 'IQD' },
 
   // --- supporting UI strings (not in Appendix A, same register) ---
