@@ -91,6 +91,10 @@ const MAP = {
       ['exec-081d5f30-0e66-4385-8b9d-145ce746d9e1.png', '04-marking-macro', null, '#111E34'],
     ],
   },
+  'mathieu-needle-holder-14cm-tc-gold': {
+    dir: 'Mathieu Needle Holder 14 cm TC Gold',
+    shots: [['needle-holder-tc-shm-catalog.png', '01-hero']],
+  },
   'forceps-adson-toothed-straight': {
     dir: 'adson forceps straight toothed',
     shots: [

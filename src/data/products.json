@@ -212,6 +212,40 @@
     "sort": 90
   },
   {
+    "slug": "mathieu-needle-holder-14cm-tc-gold",
+    "category": "needle-holders",
+    "name_en": "Mathieu Needle Holder — TC Gold",
+    "name_ar": "ماسك إبر ماتيو TC ذهبي",
+    "spec_line_en": "Mathieu Needle Holder 14cm TC Gold — Natra",
+    "price_iqd": 0,
+    "size": "14cm",
+    "variant_en": "TC Gold (Tungsten Carbide)",
+    "variant_ar": "TC ذهبي",
+    "specs_en": [
+      "Size: 14cm",
+      "TC tips",
+      "Gold-plated rings",
+      "Spring-loaded box lock",
+      "German stainless steel (Rostfrei)",
+      "CE marked"
+    ],
+    "specs_ar": [
+      "القياس: 14 سم",
+      "أطراف TC",
+      "حلقات مطلية بالذهب",
+      "قفل صندوقي بنابض",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE"
+    ],
+    "benefit_en": "Spring handle and TC tips give a firm, stable one-hand grip on the needle.",
+    "benefit_ar": "مقبض نابض وأطراف TC لمسكة ثابتة بيد واحدة على الإبرة.",
+    "in_stock": false,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 95,
+    "coming_soon": true
+  },
+  {
     "slug": "forceps-curved",
     "category": "forceps",
     "name_en": "Forceps — Curved",

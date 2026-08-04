@@ -36,6 +36,12 @@ export interface Product {
   /** Owner-flagged from real sales. Never inferred by the site. */
   best_seller?: boolean;
   /**
+   * Not for sale yet. `price_iqd` is a 0 placeholder for these — no real
+   * price exists, so nothing in the UI may render it; the product is never
+   * addable to cart, only pre-orderable via WhatsApp.
+   */
+  coming_soon?: boolean;
+  /**
    * A genuine time-limited offer.
    *
    * `price_iqd` above is always the price actually charged — the timer never
@@ -182,7 +188,7 @@ export function bySlug(slug: string): Product | undefined {
 }
 
 export function lowestPriceIn(categorySlug: string): number {
-  const list = productsInCategory(categorySlug);
+  const list = productsInCategory(categorySlug).filter((p) => !p.coming_soon);
   return list.reduce((min, p) => Math.min(min, p.price_iqd), Infinity);
 }
 
@@ -229,4 +235,5 @@ export const searchIndex = products.map((p) => ({
   en: p.name_en,
   sp: p.spec_line_en,
   p: p.price_iqd,
+  cs: p.coming_soon ?? false,
 }));

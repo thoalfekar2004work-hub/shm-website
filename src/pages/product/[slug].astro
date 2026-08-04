@@ -51,10 +51,12 @@ const specialtyEn = specialty(p, 'en');
 // Prefilled WhatsApp order message (spec §7).
 const waText = encodeURIComponent(`مرحبا، مهتم بـ ${p.name_ar} — ${p.spec_line_en}`);
 const waHref = `https://wa.me/${WHATSAPP_INTL}?text=${waText}`;
+const preorderWaText = encodeURIComponent(`مرحبا، أريد حجز مسبق لـ ${p.name_ar} — ${p.spec_line_en}`);
+const preorderWaHref = `https://wa.me/${WHATSAPP_INTL}?text=${preorderWaText}`;
 
 const ogImage = `/og/${p.slug}.jpg`;
-const priceAr = formatPrice(p.price_iqd, 'ar');
-const priceEn = formatPrice(p.price_iqd, 'en');
+const priceAr = p.coming_soon ? t['product.comingSoon'].ar : formatPrice(p.price_iqd, 'ar');
+const priceEn = p.coming_soon ? t['product.comingSoon'].en : formatPrice(p.price_iqd, 'en');
 
 const onOffer = promoActive(p);
 
@@ -70,15 +72,21 @@ const jsonLd = {
   brand: { '@type': 'Brand', name: 'Natra' },
   image: new URL(ogImage, SITE_URL).href,
   sku: p.slug,
-  offers: {
-    '@type': 'Offer',
-    price: p.price_iqd,
-    priceCurrency: 'IQD',
-    availability: p.in_stock
-      ? 'https://schema.org/InStock'
-      : 'https://schema.org/OutOfStock',
-    url: new URL(`/product/${p.slug}/`, SITE_URL).href,
-  },
+  // No real price exists yet for a coming-soon product, so no Offer is
+  // published for it rather than publishing a misleading 0 IQD price.
+  ...(p.coming_soon
+    ? {}
+    : {
+        offers: {
+          '@type': 'Offer',
+          price: p.price_iqd,
+          priceCurrency: 'IQD',
+          availability: p.in_stock
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+          url: new URL(`/product/${p.slug}/`, SITE_URL).href,
+        },
+      }),
 };
 ---
 
@@ -157,6 +165,9 @@ const jsonLd = {
           {p.best_seller && (
             <span class="badge seller"><T k="product.bestSeller" /></span>
           )}
+          {p.coming_soon && (
+            <span class="badge seller"><T k="product.comingSoon" /></span>
+          )}
           {p.low_stock && p.in_stock && (
             <span class="badge"><T k="product.lowStock" /></span>
           )}
@@ -172,7 +183,11 @@ const jsonLd = {
         <p class="name-en" data-t="en" lang="en" dir="ltr">{p.name_en}</p>
         <p class="spec-line">{p.spec_line_en}</p>
 
-        <p class="bigprice"><Price product={p} /></p>
+        {p.coming_soon ? (
+          <p class="bigprice comingsoon"><T k="product.comingSoon" /></p>
+        ) : (
+          <p class="bigprice"><Price product={p} /></p>
+        )}
 
         {onOffer && p.promo && (
           <div class="offerbox" data-promo-part>
@@ -209,7 +224,11 @@ const jsonLd = {
         <p class="qc"><T k="product.qcLine" /></p>
 
         <div class="ctas">
-          {p.in_stock ? (
+          {p.coming_soon ? (
+            <a class="btn btn-primary" href={preorderWaHref} rel="noopener">
+              <T k="product.preorderWhatsApp" />
+            </a>
+          ) : p.in_stock ? (
             <div class="cartctl" id="cart-control" data-slug={p.slug} data-state="add">
               {/* Swaps to a quantity stepper once this product is in the cart. */}
               <button type="button" class="btn btn-primary addbtn" id="add-to-cart">
@@ -242,17 +261,21 @@ const jsonLd = {
               <T k="product.unavailable" />
             </button>
           )}
-          <a class="btn btn-secondary" href={waHref} rel="noopener">
-            <T k="product.orderWhatsApp" />
-          </a>
+          {!p.coming_soon && (
+            <a class="btn btn-secondary" href={waHref} rel="noopener">
+              <T k="product.orderWhatsApp" />
+            </a>
+          )}
         </div>
 
-        <p class="undercta">
-          <a class="tocart" id="to-cart" href="/cart" hidden>
-            <T k="product.viewCart" /> →
-          </a>
-          <span class="deliv"><T k="cart.deliveryNote" /></span>
-        </p>
+        {!p.coming_soon && (
+          <p class="undercta">
+            <a class="tocart" id="to-cart" href="/cart" hidden>
+              <T k="product.viewCart" /> →
+            </a>
+            <span class="deliv"><T k="cart.deliveryNote" /></span>
+          </p>
+        )}
       </section>
     </div>
   </article>
@@ -493,6 +516,7 @@ const jsonLd = {
     font-size: var(--fs-3xl);
     text-align: start;
   }
+  .bigprice.comingsoon { color: var(--gray-700); }
 
   .offerbox {
     margin-block-end: var(--s5);

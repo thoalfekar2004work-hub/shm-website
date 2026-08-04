@@ -43,6 +43,8 @@ export const t: Dict = {
   'product.viewCart': { ar: 'شوف السلة', en: 'View cart' },
   'product.orderWhatsApp': { ar: 'اطلب عبر واتساب', en: 'Order on WhatsApp' },
   'product.unavailable': { ar: 'غير متوفر حالياً', en: 'Currently unavailable' },
+  'product.comingSoon': { ar: 'قريباً', en: 'Coming Soon' },
+  'product.preorderWhatsApp': { ar: 'اطلب حجز مسبق عبر واتساب', en: 'Pre-order on WhatsApp' },
   'product.lowStock': { ar: 'كمية محدودة', en: 'Limited stock' },
   'product.bestSeller': { ar: 'الأكثر مبيعاً', en: 'Best seller' },
   'product.offer': { ar: 'عرض', en: 'Offer' },

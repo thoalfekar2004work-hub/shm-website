@@ -38,7 +38,10 @@ const onOffer = promoActive(product);
       {product.low_stock && product.in_stock && (
         <span class="badge stock"><T k="product.lowStock" /></span>
       )}
-      {!product.in_stock && (
+      {product.coming_soon && (
+        <span class="badge seller"><T k="product.comingSoon" /></span>
+      )}
+      {!product.in_stock && !product.coming_soon && (
         <span class="badge stock"><T k="product.unavailable" /></span>
       )}
     </div>
@@ -47,7 +50,11 @@ const onOffer = promoActive(product);
   <div class="meta">
     <h3 class="name-ar" data-t="ar" lang="ar" dir="rtl">{product.name_ar}</h3>
     <p class="name-en" data-t="en" lang="en" dir="ltr">{product.name_en}</p>
-    <p class="pricerow"><Price product={product} /></p>
+    {product.coming_soon ? (
+      <p class="pricerow comingsoon"><T k="product.comingSoon" /></p>
+    ) : (
+      <p class="pricerow"><Price product={product} /></p>
+    )}
   </div>
 </a>
 
@@ -129,6 +136,10 @@ const onOffer = promoActive(product);
     margin-block-start: var(--s2);
     font-size: var(--fs-lg);
     text-align: start;
+  }
+  .pricerow.comingsoon {
+    color: var(--gray-700);
+    font-weight: 600;
   }
 
   /* Desktop-only lift; no bounce, no scale gimmicks (spec §6). */
