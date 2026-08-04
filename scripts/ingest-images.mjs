@@ -84,7 +84,11 @@ const MAP = {
       ['call_KpdTMACiFaemALflctB9GjYJ.png', '01-hero'],
       ['exec-41339c5a-71e7-4fe6-a3af-1618d1ae1271.png', '02-lock-macro'],
       ['exec-2344f770-05fb-47e4-9cc8-c080f6618bb0.png', '03-jaw-macro'],
-      ['exec-081d5f30-0e66-4385-8b9d-145ce746d9e1.png', '04-marking-macro'],
+      // Mirror-padding this one left a visible seam: the fabric has a real
+      // lighting vignette here (not flat texture like the others), so the
+      // mirrored reflection duplicates that gradient right at the fold. Flat
+      // navy blends into the container background instead.
+      ['exec-081d5f30-0e66-4385-8b9d-145ce746d9e1.png', '04-marking-macro', null, '#111E34'],
     ],
   },
   'forceps-adson-toothed-straight': {
@@ -132,7 +136,7 @@ const MAP = {
  * pixels 1:1 with no scaling, so the weave's texture and grain size carry
  * through unchanged and the seam disappears into it.
  */
-async function padToSquare(buffer) {
+async function padToSquare(buffer, flatColor) {
   const { width, height } = await sharp(buffer).metadata();
   if (width === height) return buffer;
 
@@ -143,7 +147,11 @@ async function padToSquare(buffer) {
   const right = width > height ? 0 : side - width - left;
 
   return sharp(buffer)
-    .extend({ top, bottom, left, right, extendWith: 'mirror' })
+    .extend(
+      flatColor
+        ? { top, bottom, left, right, extendWith: 'background', background: flatColor }
+        : { top, bottom, left, right, extendWith: 'mirror' },
+    )
     .jpeg({ quality: QUALITY, mozjpeg: true })
     .toBuffer();
 }
@@ -155,7 +163,7 @@ async function ingest() {
     await rm(dest, { recursive: true, force: true });
     await mkdir(dest, { recursive: true });
 
-    for (const [file, name, crop] of shots) {
+    for (const [file, name, crop, padColor] of shots) {
       const from = path.join(SRC, dir, file);
       if (!existsSync(from)) throw new Error(`missing source image: ${from}`);
       let img = sharp(from);
@@ -165,7 +173,7 @@ async function ingest() {
         .jpeg({ quality: QUALITY, mozjpeg: true })
         .toBuffer();
 
-      const squared = await padToSquare(resized);
+      const squared = await padToSquare(resized, padColor);
       await writeFile(path.join(dest, `${name}.jpg`), squared);
       count++;
     }
