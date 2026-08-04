@@ -44,7 +44,6 @@ const panels = SEQUENCE.map((slug) => {
           <div class="panel-copy">
             <h2 class="panel-name name-ar" data-t="ar" lang="ar" dir="rtl">{p.name_ar}</h2>
             <p class="panel-name-en name-en" data-t="en" lang="en" dir="ltr">{p.name_en}</p>
-            <p class="spec-line">{p.spec_line_en}</p>
             {(benefitAr || benefitEn) && (
               <p class="panel-benefit">
                 <span data-t="ar">{benefitAr}</span><span data-t="en">{benefitEn}</span>
@@ -115,8 +114,6 @@ const panels = SEQUENCE.map((slug) => {
     font-size: var(--fs-base);
     color: var(--white);
   }
-  .panel .spec-line { color: var(--white); }
-
   .panel-benefit {
     font-size: var(--fs-base);
     color: var(--white);
@@ -141,8 +138,7 @@ const panels = SEQUENCE.map((slug) => {
 
   /* Centre alignment beats the page-direction rules for this block only. */
   .panel :global(.name-ar),
-  .panel :global(.name-en),
-  .panel :global(.spec-line) { text-align: center; }
+  .panel :global(.name-en) { text-align: center; }
 
   @media (min-width: 560px) {
     .panels { grid-template-columns: repeat(2, 1fr); }
