@@ -246,6 +246,36 @@
     "coming_soon": true
   },
   {
+    "slug": "castroviejo-needle-holder-straight",
+    "category": "needle-holders",
+    "name_en": "Castroviejo Needle Holder — Straight",
+    "name_ar": "ماسك إبر كاستروفيجو مستقيم",
+    "spec_line_en": "Castroviejo Needle Holder Straight 12cm & 14cm — Natra",
+    "price_iqd": 0,
+    "size": "12cm & 14cm",
+    "specs_en": [
+      "Sizes: 12cm & 14cm",
+      "Straight jaws",
+      "Spring handle",
+      "German stainless steel (Rostfrei)",
+      "CE marked"
+    ],
+    "specs_ar": [
+      "القياسات: 12 سم و14 سم",
+      "فكوك مستقيمة",
+      "مقبض نابض",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE"
+    ],
+    "benefit_en": "Straight jaws and a spring handle for precise, one-hand needle control.",
+    "benefit_ar": "فكوك مستقيمة ومقبض نابض للتحكم الدقيق بالإبرة بيد واحدة.",
+    "in_stock": false,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 97,
+    "coming_soon": true
+  },
+  {
     "slug": "forceps-curved",
     "category": "forceps",
     "name_en": "Forceps — Curved",
@@ -396,5 +426,37 @@
       "ends": "2026-08-10T21:00:00+03:00"
     },
     "sort": 210
+  },
+  {
+    "slug": "castroviejo-caliper-9cm",
+    "category": "calipers",
+    "name_en": "Castroviejo Caliper — Spring Gauge",
+    "name_ar": "فرجار كاستروفيجو",
+    "spec_line_en": "Castroviejo Gauge Spring Caliper 9cm — Natra",
+    "price_iqd": 0,
+    "size": "9cm",
+    "specs_en": [
+      "Size: 9cm",
+      "0–40mm graduated scale",
+      "Spring-loaded",
+      "Protective tip guards",
+      "German stainless steel (Rostfrei)",
+      "CE marked"
+    ],
+    "specs_ar": [
+      "القياس: 9 سم",
+      "تدريج 0–40 ملم",
+      "نابض ذاتي الفتح",
+      "واقيات أطراف",
+      "ستانلس ستيل ألماني (Rostfrei)",
+      "علامة CE"
+    ],
+    "benefit_en": "Spring action and a 0–40mm scale for quick, precise measurements.",
+    "benefit_ar": "نابض ذاتي وتدريج 0–40 ملم لقياسات سريعة ودقيقة.",
+    "in_stock": false,
+    "low_stock": false,
+    "is_set": false,
+    "sort": 230,
+    "coming_soon": true
   }
 ]

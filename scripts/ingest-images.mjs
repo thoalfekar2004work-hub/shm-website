@@ -95,6 +95,14 @@ const MAP = {
     dir: 'Mathieu Needle Holder 14 cm TC Gold',
     shots: [['needle-holder-tc-shm-catalog.png', '01-hero']],
   },
+  'castroviejo-needle-holder-straight': {
+    dir: 'Castroviejo Needle Holder Straight 12cm&14cm',
+    shots: [['exec-c7078ee0-760d-4019-888c-deb824c16f1b.png', '01-hero']],
+  },
+  'castroviejo-caliper-9cm': {
+    dir: 'Castroviejo Gauge Spring Caliper 9 cm',
+    shots: [['exec-7ba79450-a628-4f51-9d89-ab44d3d24368.png', '01-hero']],
+  },
   'forceps-adson-toothed-straight': {
     dir: 'adson forceps straight toothed',
     shots: [
