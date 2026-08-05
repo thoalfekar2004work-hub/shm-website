@@ -30,7 +30,9 @@ const tiles = categories.map((c) => ({
   tileProduct: bySlug(c.tile_product)!,
 }));
 
-const setsFrom = sets.reduce((min, s) => Math.min(min, s.price_iqd), Infinity);
+const setsFrom = sets
+  .filter((s) => !s.coming_soon)
+  .reduce((min, s) => Math.min(min, s.price_iqd), Infinity);
 const setsTile = sets[0];
 
 /**
@@ -127,13 +129,17 @@ const HERO_PHOTOS = [
             <div class="meta">
               <h2 class="name-ar" data-t="ar" lang="ar" dir="rtl">{cat.name_ar}</h2>
               <p class="name-en" data-t="en" lang="en" dir="ltr">{cat.name_en}</p>
-              <p class="from">
-                <T k="grid.from" />{' '}
-                <span class="price">
-                  <span data-t="ar">{formatPrice(from, 'ar')}</span><span data-t="en"
-                    >{formatPrice(from, 'en')}</span>
-                </span>
-              </p>
+              {from === Infinity ? (
+                <p class="from comingsoon"><T k="product.comingSoon" /></p>
+              ) : (
+                <p class="from">
+                  <T k="grid.from" />{' '}
+                  <span class="price">
+                    <span data-t="ar">{formatPrice(from, 'ar')}</span><span data-t="en"
+                      >{formatPrice(from, 'en')}</span>
+                  </span>
+                </p>
+              )}
             </div>
           </a>
         </li>
@@ -157,13 +163,17 @@ const HERO_PHOTOS = [
             <div class="meta">
               <h2 class="name-ar" data-t="ar" lang="ar" dir="rtl">الستات</h2>
               <p class="name-en" data-t="en" lang="en" dir="ltr">Sets</p>
-              <p class="from">
-                <T k="grid.from" />{' '}
-                <span class="price">
-                  <span data-t="ar">{formatPrice(setsFrom, 'ar')}</span><span data-t="en"
-                    >{formatPrice(setsFrom, 'en')}</span>
-                </span>
-              </p>
+              {setsFrom === Infinity ? (
+                <p class="from comingsoon"><T k="product.comingSoon" /></p>
+              ) : (
+                <p class="from">
+                  <T k="grid.from" />{' '}
+                  <span class="price">
+                    <span data-t="ar">{formatPrice(setsFrom, 'ar')}</span><span data-t="en"
+                      >{formatPrice(setsFrom, 'en')}</span>
+                  </span>
+                </p>
+              )}
             </div>
           </a>
         </li>
@@ -317,6 +327,7 @@ const HERO_PHOTOS = [
     color: var(--gray-700);
     text-align: start;
   }
+  .from.comingsoon { font-weight: 600; }
 
   @media (min-width: 560px) {
     .grid { grid-template-columns: repeat(2, 1fr); }
