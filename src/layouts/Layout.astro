@@ -41,10 +41,9 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#111E34" />
-    <!-- The site has one deliberately light design; this stops browsers from
-         auto-darkening it (and mismatching our own colors) when the visitor's
-         OS/browser prefers dark. -->
-    <meta name="color-scheme" content="light" />
+    <!-- Real light/dark support now lives in tokens.css (html[data-theme]),
+         applied before paint below — no forced color-scheme here. -->
+    <meta name="color-scheme" content="light dark" />
 
     <title data-page-title-ar={titleAr} data-page-title-en={titleEn}>{titleEn}</title>
     <meta name="description" content={descEn} data-desc-ar={descAr} data-desc-en={descEn} />
@@ -91,6 +90,20 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
           }
         } catch (e) {}
       })();
+
+      // Same idea for theme: an explicit saved choice wins, otherwise fall
+      // back to the OS/browser preference — applied before paint either way.
+      (function () {
+        try {
+          var saved = localStorage.getItem('shm.theme');
+          var dark =
+            saved === 'dark' ||
+            (saved !== 'light' &&
+              window.matchMedia &&
+              window.matchMedia('(prefers-color-scheme: dark)').matches);
+          if (dark) document.documentElement.setAttribute('data-theme', 'dark');
+        } catch (e) {}
+      })();
     </script>
 
     <style is:global>
@@ -112,10 +125,12 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
 
     <script>
       import { initLangToggle } from '../scripts/i18n';
+      import { initThemeToggle } from '../scripts/theme';
       import { initCartBadge } from '../scripts/cart';
       import { initMotion } from '../scripts/motion';
       import { initCountdowns } from '../scripts/promo';
       initLangToggle();
+      initThemeToggle();
       initCartBadge();
       initMotion();
       initCountdowns();

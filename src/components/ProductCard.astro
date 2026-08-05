@@ -64,7 +64,7 @@ const onOffer = promoActive(product);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
-    background: var(--white);
+    background: var(--surface);
     transition: transform 170ms var(--ease), box-shadow 170ms var(--ease);
   }
 
@@ -96,8 +96,10 @@ const onOffer = promoActive(product);
   .flags .badge {
     /* Solid, not translucent + backdrop-filter: Safari treats backdrop-filter
        as another compositing trigger and it interacts badly with the sticky
-       bar scrolling past. */
+       bar scrolling past. Fixed white-on-navy regardless of site theme —
+       this chip floats over the product photo, not the page canvas. */
     background: var(--white);
+    color: var(--navy);
   }
   /* Navy, not red: §0.3 keeps red for prices and primary CTAs. The struck
      original beside the red price already carries the offer. */

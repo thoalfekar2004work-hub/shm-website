@@ -108,6 +108,7 @@ export const t: Dict = {
   'nav.closeSearch': { ar: 'إغلاق البحث', en: 'Close search' },
   'nav.cart': { ar: 'السلة', en: 'Cart' },
   'nav.language': { ar: 'اللغة', en: 'Language' },
+  'nav.darkMode': { ar: 'الوضع الليلي', en: 'Dark mode' },
   'nav.menu': { ar: 'القائمة', en: 'Menu' },
   'search.noResults': { ar: 'ما لكينا نتيجة', en: 'No results' },
   'cart.remove': { ar: 'حذف', en: 'Remove' },

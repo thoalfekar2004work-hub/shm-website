@@ -17,7 +17,8 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
 <header class="nav">
   <div class="wrap nav-inner">
     <a class="brand" href="/" aria-label="SHM">
-      <img src="/shm-logo-navy.png" alt="SHM" width="278" height="353" />
+      <img class="brand-logo-light" src="/shm-logo-navy.png" alt="SHM" width="278" height="353" />
+      <img class="brand-logo-dark" src="/shm-logo-white.png" alt="SHM" width="278" height="353" />
     </a>
 
     <nav class="links" aria-label="Catalog">
@@ -65,6 +66,24 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
         data-arialabel-en={t['nav.language'].en}
         aria-label={t['nav.language'].ar}>
         <span data-t="ar">EN</span><span data-t="en">ع</span>
+      </button>
+
+      <button
+        type="button"
+        class="iconbtn"
+        data-theme-toggle
+        data-arialabel-ar={t['nav.darkMode'].ar}
+        data-arialabel-en={t['nav.darkMode'].en}
+        aria-label={t['nav.darkMode'].ar}>
+        <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"></path>
+        </svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4.5"></circle>
+          <path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8 6 18M18 6l1.8-1.8"></path>
+        </svg>
       </button>
     </div>
   </div>
@@ -191,7 +210,7 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
     position: sticky;
     top: 0;
     z-index: 100;
-    background: var(--white);
+    background: var(--surface);
     border-block-end: 1px solid var(--border);
     transition: box-shadow 220ms var(--ease), border-color 220ms var(--ease);
     /* Safari repaints a sticky bar against whatever scrolled past it and can
@@ -224,6 +243,9 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
     height: 34px;
     width: auto;
   }
+  .brand-logo-dark { display: none; }
+  html[data-theme='dark'] .brand-logo-light { display: none; }
+  html[data-theme='dark'] .brand-logo-dark { display: block; }
 
   .links {
     display: flex;
@@ -237,7 +259,7 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
     padding-block: var(--s2);
     font-weight: 600;
     font-size: var(--fs-sm);
-    color: var(--navy);
+    color: var(--text);
     white-space: nowrap;
   }
   /* Red underline on the active nav item — the one permitted decorative red
@@ -269,12 +291,16 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
     background: none;
     border: 0;
     border-radius: var(--radius-sm);
-    color: var(--navy);
+    color: var(--text);
     cursor: pointer;
     position: relative;
   }
   .iconbtn:hover,
   .langbtn:hover { background: var(--gray-50); }
+
+  .icon-sun { display: none; }
+  html[data-theme='dark'] .icon-moon { display: none; }
+  html[data-theme='dark'] .icon-sun { display: block; }
 
   .langbtn {
     font-weight: 700;
@@ -302,7 +328,7 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
 
   .searchpanel {
     border-block-start: 1px solid var(--border);
-    background: var(--white);
+    background: var(--surface);
     padding-block: var(--s4);
   }
   .searchpanel input {
@@ -310,14 +336,14 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
     padding: var(--s4);
     font: inherit;
     font-size: var(--fs-base);
-    color: var(--navy);
+    color: var(--text);
     border: 1.5px solid var(--border-input);
     border-radius: var(--radius-sm);
     background: var(--gray-50);
   }
   .searchpanel input:focus {
-    background: var(--white);
-    border-color: var(--navy);
+    background: var(--surface);
+    border-color: var(--text);
   }
 
   .results {

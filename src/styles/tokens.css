@@ -67,6 +67,10 @@
   /* Form controls: a user has to be able to see where the field is, so this
      one clears the 3:1 non-text contrast floor (WCAG 1.4.11) — 3.26:1. */
   --border-input: #868fa0;
+  /* Card/nav/panel surfaces — split out from --white because in dark mode
+     white text-on-navy (footer, badges, showcase) has to stay put while
+     these actually need to go dark. */
+  --surface: var(--white);
 
   --radius-sm: 8px;
   --radius: 12px;
@@ -112,6 +116,36 @@ html[lang='en'] {
 }
 html[lang='ar'] {
   --font-body: var(--font-ar);
+}
+
+/*
+ * Dark mode. --navy and --white are deliberately untouched here: every
+ * existing navy-background section (footer, showcase, badges, the proof
+ * strip) already puts white text on a dark surface and stays exactly as
+ * designed. This block only redefines the tokens that represent the *page's*
+ * own light/dark surface — --bg, --text, --surface, and the gray/border
+ * scale that both text and box-fills draw from. --border and --text-muted
+ * need no entry here: they're already `var()` references onto --gray-200
+ * and --gray-500, so they follow automatically.
+ */
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: #0a1120;
+  --text: #f2f4f7;
+
+  --gray-50: #111b2e;
+  --gray-100: #182540;
+  --gray-200: #24314a;
+  --gray-500: #96a2b8;
+  --gray-700: #c9d1de;
+
+  --border-input: #46577a;
+  --error: #ff7a7a;
+
+  /* Cards, nav, panels: one step lighter than the page canvas, reusing the
+     brand navy instead of inventing a new dark neutral. */
+  --surface: var(--navy);
 }
 
 @media (min-width: 768px) {
