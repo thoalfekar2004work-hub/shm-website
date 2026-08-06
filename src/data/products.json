@@ -435,7 +435,17 @@
       "was_iqd": 90000,
       "ends": "2026-08-10T21:00:00+03:00"
     },
-    "sort": 210
+    "sort": 210,
+    "contents_en": [
+      "Kelly Hemostat, 15cm, Curved",
+      "Mayo Scissors — Curved, 14cm",
+      "Metzenbaum Scissors — Blunt Curved, 14cm"
+    ],
+    "contents_ar": [
+      "مشبك كيلي، 15 سم، منحني",
+      "مقص مايو منحني، 14 سم",
+      "مقص ميتزنباوم منحني كليل، 14 سم"
+    ]
   },
   {
     "slug": "castroviejo-caliper-9cm",
