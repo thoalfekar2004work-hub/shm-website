@@ -21,11 +21,13 @@ const showWas = promoActive(p);
 {showWas && p.promo && (
   <s class="was" data-promo-part aria-label={t['product.wasPrice'].ar}>
     <span data-t="ar">{formatPrice(p.promo.was_iqd, 'ar')}</span><span data-t="en"
-      >{formatPrice(p.promo.was_iqd, 'en')}</span>
+      >{formatPrice(p.promo.was_iqd, 'en')}</span><span data-t="ku"
+      >{formatPrice(p.promo.was_iqd, 'ku')}</span>
   </s>
 )}<span class:list={['price', cls]}>
   <span data-t="ar">{formatPrice(p.price_iqd, 'ar')}</span><span data-t="en"
-    >{formatPrice(p.price_iqd, 'en')}</span>
+    >{formatPrice(p.price_iqd, 'en')}</span><span data-t="ku"
+    >{formatPrice(p.price_iqd, 'ku')}</span>
 </span>
 
 <style>

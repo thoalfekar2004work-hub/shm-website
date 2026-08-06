@@ -18,14 +18,17 @@ const ogImage = `/og/${cat.tile_product}.jpg`;
 <Layout
   titleAr={`${cat.name_ar} — SHM`}
   titleEn={`${cat.name_en} — SHM`}
+  titleKu={`${cat.name_ku ?? cat.name_en} — SHM`}
   descAr={`${cat.name_ar} بعلامة Natra — ستانلس ستيل بعلامة CE، نفحص كل قطعة قبل الشحن.`}
   descEn={`Natra ${cat.name_en} — CE-marked stainless steel, QC-tested before shipping.`}
+  descKu={`سێتی ${cat.name_ku ?? cat.name_en} ی Natra — پۆڵای بۆننەگیر بە نیشانی CE، هەموو پارچەیەک پێش ناردن پشکنین دەکرێت.`}
   canonicalPath={`/category/${cat.slug}/`}
   ogImage={ogImage}>
   <div class="wrap page">
     <header class="head" data-reveal="fade">
       <h1 class="title-ar" data-t="ar" lang="ar" dir="rtl">{cat.name_ar}</h1>
       <p class="title-en" data-t="en" lang="en" dir="ltr">{cat.name_en}</p>
+      <h1 class="title-ar" data-t="ku" lang="ku" dir="rtl">{cat.name_ku ?? cat.name_en}</h1>
     </header>
 
     <ul class="grid">

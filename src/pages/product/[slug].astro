@@ -41,12 +41,16 @@ const zoom = await Promise.all(
 
 const specsAr = specs(p, 'ar');
 const specsEn = specs(p, 'en');
+const specsKu = specs(p, 'ku');
 const benefitAr = benefit(p, 'ar');
 const benefitEn = benefit(p, 'en');
+const benefitKu = benefit(p, 'ku');
 const contentsAr = contents(p, 'ar');
 const contentsEn = contents(p, 'en');
+const contentsKu = contents(p, 'ku');
 const specialtyAr = specialty(p, 'ar');
 const specialtyEn = specialty(p, 'en');
+const specialtyKu = specialty(p, 'ku');
 
 // Prefilled WhatsApp order message (spec §7).
 const waText = encodeURIComponent(`مرحبا، مهتم بـ ${p.name_ar} — ${p.spec_line_en}`);
@@ -57,6 +61,7 @@ const preorderWaHref = `https://wa.me/${WHATSAPP_INTL}?text=${preorderWaText}`;
 const ogImage = `/og/${p.slug}.jpg`;
 const priceAr = p.coming_soon ? t['product.comingSoon'].ar : formatPrice(p.price_iqd, 'ar');
 const priceEn = p.coming_soon ? t['product.comingSoon'].en : formatPrice(p.price_iqd, 'en');
+const priceKu = p.coming_soon ? t['product.comingSoon'].ku : formatPrice(p.price_iqd, 'ku');
 
 const onOffer = promoActive(p);
 
@@ -93,8 +98,10 @@ const jsonLd = {
 <Layout
   titleAr={`${p.name_ar} — ${priceAr} — SHM`}
   titleEn={`${p.name_en} — ${priceEn} — SHM`}
+  titleKu={`${p.name_ku ?? p.name_en} — ${priceKu} — SHM`}
   descAr={ogDesc}
   descEn={`${priceEn} · ${t['product.qcLine'].en}`}
+  descKu={`${priceKu} · ${t['product.qcLine'].ku}`}
   canonicalPath={`/product/${p.slug}/`}
   ogTitle={ogTitle}
   ogImage={ogImage}
@@ -171,16 +178,18 @@ const jsonLd = {
           {p.low_stock && p.in_stock && (
             <span class="badge"><T k="product.lowStock" /></span>
           )}
-          {(specialtyAr || specialtyEn) && (
+          {(specialtyAr || specialtyEn || specialtyKu) && (
             <span class="badge">
               <span data-t="ar">{specialtyAr ?? specialtyEn}</span><span data-t="en"
-                >{specialtyEn ?? specialtyAr}</span>
+                >{specialtyEn ?? specialtyAr}</span><span data-t="ku"
+                >{specialtyKu ?? specialtyEn ?? specialtyAr}</span>
             </span>
           )}
         </div>
 
         <h1 class="name-ar" data-t="ar" lang="ar" dir="rtl">{p.name_ar}</h1>
         <p class="name-en" data-t="en" lang="en" dir="ltr">{p.name_en}</p>
+        <h1 class="name-ar" data-t="ku" lang="ku" dir="rtl">{p.name_ku ?? p.name_en}</h1>
         <p class="spec-line">{p.spec_line_en}</p>
 
         {p.coming_soon ? (
@@ -204,7 +213,8 @@ const jsonLd = {
           <ul class="specs">
             {specsAr.map((s, i) => (
               <li>
-                <span data-t="ar">{s}</span><span data-t="en">{specsEn[i] ?? s}</span>
+                <span data-t="ar">{s}</span><span data-t="en">{specsEn[i] ?? s}</span><span
+                  data-t="ku">{specsKu[i] ?? specsEn[i] ?? s}</span>
               </li>
             ))}
           </ul>
@@ -214,15 +224,17 @@ const jsonLd = {
           <ul class="specs contents">
             {contentsAr.map((s, i) => (
               <li>
-                <span data-t="ar">{s}</span><span data-t="en">{contentsEn[i] ?? s}</span>
+                <span data-t="ar">{s}</span><span data-t="en">{contentsEn[i] ?? s}</span><span
+                  data-t="ku">{contentsKu[i] ?? contentsEn[i] ?? s}</span>
               </li>
             ))}
           </ul>
         )}
 
-        {(benefitAr || benefitEn) && (
+        {(benefitAr || benefitEn || benefitKu) && (
           <p class="benefit">
-            <span data-t="ar">{benefitAr}</span><span data-t="en">{benefitEn}</span>
+            <span data-t="ar">{benefitAr}</span><span data-t="en">{benefitEn}</span><span
+              data-t="ku">{benefitKu ?? benefitEn}</span>
           </p>
         )}
 
@@ -529,7 +541,7 @@ const jsonLd = {
     margin-inline-start: var(--s3);
     font-size: var(--fs-base);
     font-weight: 700;
-    color: var(--navy);
+    color: var(--text);
     vertical-align: middle;
   }
 

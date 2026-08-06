@@ -50,6 +50,7 @@ const onOffer = promoActive(product);
   <div class="meta">
     <h3 class="name-ar" data-t="ar" lang="ar" dir="rtl">{product.name_ar}</h3>
     <p class="name-en" data-t="en" lang="en" dir="ltr">{product.name_en}</p>
+    <h3 class="name-ar" data-t="ku" lang="ku" dir="rtl">{product.name_ku ?? product.name_en}</h3>
     {product.coming_soon ? (
       <p class="pricerow comingsoon"><T k="product.comingSoon" /></p>
     ) : (
@@ -153,7 +154,7 @@ const onOffer = promoActive(product);
     margin-block-start: 2px;
     font-size: var(--fs-sm);
     font-weight: 700;
-    color: var(--navy);
+    color: var(--text);
   }
 
   /* Desktop-only lift; no bounce, no scale gimmicks (spec §6). */

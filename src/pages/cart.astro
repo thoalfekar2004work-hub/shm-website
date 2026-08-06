@@ -20,6 +20,7 @@ const table = products.map((p) => ({
   slug: p.slug,
   ar: p.name_ar,
   en: p.name_en,
+  ku: p.name_ku ?? p.name_en,
   sp: p.spec_line_en,
   price: p.price_iqd,
   img: thumbs[p.slug],
@@ -27,12 +28,12 @@ const table = products.map((p) => ({
 }));
 
 const labels = {
-  qty: { ar: t['cart.qty'].ar, en: t['cart.qty'].en },
-  remove: { ar: t['cart.remove'].ar, en: t['cart.remove'].en },
-  increase: { ar: t['cart.increase'].ar, en: t['cart.increase'].en },
-  decrease: { ar: t['cart.decrease'].ar, en: t['cart.decrease'].en },
-  unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
-  free: { ar: t['price.free'].ar, en: t['price.free'].en },
+  qty: t['cart.qty'],
+  remove: t['cart.remove'],
+  increase: t['cart.increase'],
+  decrease: t['cart.decrease'],
+  unit: t['price.unit'],
+  free: t['price.free'],
 };
 ---
 
@@ -87,6 +88,7 @@ const labels = {
     slug: string;
     ar: string;
     en: string;
+    ku: string;
     sp: string;
     price: number;
     img: string;
@@ -106,8 +108,10 @@ const labels = {
   const subtotalEl = document.getElementById('cart-subtotal');
   const deliveryEl = document.getElementById('cart-delivery');
 
-  const money = (n: number, lang: 'ar' | 'en') =>
+  const money = (n: number, lang: 'ar' | 'en' | 'ku') =>
     `${n.toLocaleString('en-US')} ${labels.unit[lang]}`;
+  const nameFor = (p: Row, lang: 'ar' | 'en' | 'ku') =>
+    lang === 'ar' ? p.ar : lang === 'ku' ? p.ku : p.en;
 
   function render() {
     if (!listEl || !emptyEl || !filledEl || !totalEl) return;
@@ -133,7 +137,7 @@ const labels = {
           <img src="${p.img}" alt="${p.en}" width="80" height="80" loading="lazy" />
         </a>
         <div class="info">
-          <a class="lname" href="/product/${p.slug}">${lang === 'ar' ? p.ar : p.en}</a>
+          <a class="lname" href="/product/${p.slug}">${nameFor(p, lang)}</a>
           <p class="spec-line">${p.sp}</p>
           <p class="unit price">${money(p.price, lang)}</p>
         </div>

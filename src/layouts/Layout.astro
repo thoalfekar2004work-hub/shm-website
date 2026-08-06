@@ -10,6 +10,10 @@ interface Props {
   titleEn: string;
   descAr: string;
   descEn: string;
+  /** Kurdish title/description are optional — pages that haven't been given
+   * one yet fall back to the English version rather than going blank. */
+  titleKu?: string;
+  descKu?: string;
   /** Overrides og:title when the unfurl headline differs from the page title. */
   ogTitle?: string;
   /** Absolute or root-relative URL of the social preview image. */
@@ -24,6 +28,8 @@ const {
   titleEn,
   descAr,
   descEn,
+  titleKu = titleEn,
+  descKu = descEn,
   ogTitle,
   ogImage,
   ogImageAlt,
@@ -45,8 +51,17 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
          applied before paint below — no forced color-scheme here. -->
     <meta name="color-scheme" content="light dark" />
 
-    <title data-page-title-ar={titleAr} data-page-title-en={titleEn}>{titleEn}</title>
-    <meta name="description" content={descEn} data-desc-ar={descAr} data-desc-en={descEn} />
+    <title
+      data-page-title-ar={titleAr}
+      data-page-title-en={titleEn}
+      data-page-title-ku={titleKu}>{titleEn}</title>
+    <meta
+      name="description"
+      content={descEn}
+      data-desc-ar={descAr}
+      data-desc-en={descEn}
+      data-desc-ku={descKu}
+    />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
 
@@ -73,20 +88,20 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
 
     <script is:inline>
       // Apply the saved language before first paint so nothing flashes.
-      // English is the served default; only a saved "ar" choice switches it.
-      // Title/description are swapped here too, since they're SSR'd in
-      // English and otherwise wouldn't match a returning Arabic visitor
-      // until the in-page toggle script ran.
+      // English is the served default; only a saved "ar" or "ku" choice
+      // switches it (both are RTL). Title/description are swapped here too,
+      // since they're SSR'd in English and otherwise wouldn't match a
+      // returning Arabic/Kurdish visitor until the in-page toggle script ran.
       (function () {
         try {
           var l = localStorage.getItem('shm.lang');
-          if (l === 'ar') {
-            document.documentElement.setAttribute('lang', 'ar');
+          if (l === 'ar' || l === 'ku') {
+            document.documentElement.setAttribute('lang', l);
             document.documentElement.setAttribute('dir', 'rtl');
-            var titleEl = document.querySelector('title[data-page-title-ar]');
-            if (titleEl) document.title = titleEl.getAttribute('data-page-title-ar');
-            var descEl = document.querySelector('meta[name="description"][data-desc-ar]');
-            if (descEl) descEl.setAttribute('content', descEl.getAttribute('data-desc-ar'));
+            var titleEl = document.querySelector('title[data-page-title-' + l + ']');
+            if (titleEl) document.title = titleEl.getAttribute('data-page-title-' + l);
+            var descEl = document.querySelector('meta[name="description"][data-desc-' + l + ']');
+            if (descEl) descEl.setAttribute('content', descEl.getAttribute('data-desc-' + l));
           }
         } catch (e) {}
       })();
@@ -107,15 +122,18 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
     </script>
 
     <style is:global>
-      /* Show only the active language. */
-      html[lang='ar'] [data-t='en'] { display: none; }
-      html[lang='en'] [data-t='ar'] { display: none; }
+      /* Show only the active language — generalizes to any number of
+         data-t variants, unlike a pairwise "hide the other one" rule. */
+      html:not([lang='ar']) [data-t='ar'] { display: none; }
+      html:not([lang='en']) [data-t='en'] { display: none; }
+      html:not([lang='ku']) [data-t='ku'] { display: none; }
     </style>
   </head>
 
   <body>
     <a class="skip-link" href="#main">
-      <span data-t="ar">تخطَّ إلى المحتوى</span><span data-t="en">Skip to content</span>
+      <span data-t="ar">تخطَّ إلى المحتوى</span><span data-t="en">Skip to content</span><span
+        data-t="ku">بازدان بۆ ناوەرۆک</span>
     </a>
     <Nav />
     <main id="main">
@@ -124,12 +142,12 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
     <Footer />
 
     <script>
-      import { initLangToggle } from '../scripts/i18n';
+      import { initLang } from '../scripts/i18n';
       import { initThemeToggle } from '../scripts/theme';
       import { initCartBadge } from '../scripts/cart';
       import { initMotion } from '../scripts/motion';
       import { initCountdowns } from '../scripts/promo';
-      initLangToggle();
+      initLang();
       initThemeToggle();
       initCartBadge();
       initMotion();

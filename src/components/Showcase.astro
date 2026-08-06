@@ -19,6 +19,7 @@ const panels = SEQUENCE.map((slug) => {
     hero: heroFor(slug),
     benefitAr: benefit(product, 'ar'),
     benefitEn: benefit(product, 'en'),
+    benefitKu: benefit(product, 'ku'),
   };
 });
 ---
@@ -27,11 +28,12 @@ const panels = SEQUENCE.map((slug) => {
   <div class="wrap">
     <p class="mostordered">
       <span data-t="ar" lang="ar" dir="rtl">{t['showcase.mostOrdered'].ar}</span><span data-t="en"
-        lang="en" dir="ltr">{t['showcase.mostOrdered'].en}</span>
+        lang="en" dir="ltr">{t['showcase.mostOrdered'].en}</span><span data-t="ku" lang="ku"
+        dir="rtl">{t['showcase.mostOrdered'].ku}</span>
     </p>
     <div class="glowbox">
     <ul class="panels">
-      {panels.map(({ product: p, hero, benefitAr, benefitEn }, i) => (
+      {panels.map(({ product: p, hero, benefitAr, benefitEn, benefitKu }, i) => (
         <li class="panel">
           <a class="panel-shot" href={`/product/${p.slug}`} tabindex="-1" aria-hidden="true">
             <Image
@@ -49,18 +51,21 @@ const panels = SEQUENCE.map((slug) => {
           <div class="panel-copy">
             <h2 class="panel-name name-ar" data-t="ar" lang="ar" dir="rtl">{p.name_ar}</h2>
             <p class="panel-name-en name-en" data-t="en" lang="en" dir="ltr">{p.name_en}</p>
-            {(benefitAr || benefitEn) && (
+            <h2 class="panel-name name-ar" data-t="ku" lang="ku" dir="rtl">{p.name_ku ?? p.name_en}</h2>
+            {(benefitAr || benefitEn || benefitKu) && (
               <p class="panel-benefit">
-                <span data-t="ar">{benefitAr}</span><span data-t="en">{benefitEn}</span>
+                <span data-t="ar">{benefitAr}</span><span data-t="en">{benefitEn}</span><span
+                  data-t="ku">{benefitKu ?? benefitEn}</span>
               </p>
             )}
             <p class="panel-price price">
               <span data-t="ar">{formatPrice(p.price_iqd, 'ar')}</span><span data-t="en"
-                >{formatPrice(p.price_iqd, 'en')}</span>
+                >{formatPrice(p.price_iqd, 'en')}</span><span data-t="ku"
+                >{formatPrice(p.price_iqd, 'ku')}</span>
             </p>
             <a class="btn panel-cta" href={`/product/${p.slug}`}>
               <span data-t="ar">{t['product.addToCart'].ar}</span><span data-t="en"
-                >{t['product.addToCart'].en}</span>
+                >{t['product.addToCart'].en}</span><span data-t="ku">{t['product.addToCart'].ku}</span>
             </a>
           </div>
         </li>

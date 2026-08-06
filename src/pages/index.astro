@@ -3,7 +3,6 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import T from '../components/T.astro';
 import Showcase from '../components/Showcase.astro';
-import BestSellers from '../components/BestSellers.astro';
 import {
   categories,
   heroFor,
@@ -18,6 +17,8 @@ import {
   HERO_LINE_2,
   HERO_LINE_1_AR,
   HERO_LINE_2_AR,
+  HERO_LINE_1_KU,
+  HERO_LINE_2_KU,
   formatPrice,
 } from '../i18n/strings';
 
@@ -70,6 +71,10 @@ const HERO_PHOTOS = [
           <h1 class="h1 hero-ar enter enter-1" lang="ar" dir="rtl">{HERO_LINE_1_AR}</h1>
           <p class="h2 hero-ar enter enter-2" lang="ar" dir="rtl">{HERO_LINE_2_AR}</p>
         </div>
+        <div data-t="ku">
+          <h1 class="h1 hero-ar enter enter-1" lang="ku" dir="rtl">{HERO_LINE_1_KU}</h1>
+          <p class="h2 hero-ar enter enter-2" lang="ku" dir="rtl">{HERO_LINE_2_KU}</p>
+        </div>
         <a class="btn btn-primary hero-cta enter enter-4" href="#catalog"><T k="hero.cta" /></a>
       </div>
 
@@ -116,6 +121,7 @@ const HERO_PHOTOS = [
             <div class="meta">
               <h2 class="name-ar" data-t="ar" lang="ar" dir="rtl">{cat.name_ar}</h2>
               <p class="name-en" data-t="en" lang="en" dir="ltr">{cat.name_en}</p>
+              <h2 class="name-ar" data-t="ku" lang="ku" dir="rtl">{cat.name_ku ?? cat.name_en}</h2>
               {from === Infinity ? (
                 <p class="from comingsoon"><T k="product.comingSoon" /></p>
               ) : (
@@ -123,7 +129,8 @@ const HERO_PHOTOS = [
                   <T k="grid.from" />{' '}
                   <span class="price">
                     <span data-t="ar">{formatPrice(from, 'ar')}</span><span data-t="en"
-                      >{formatPrice(from, 'en')}</span>
+                      >{formatPrice(from, 'en')}</span><span data-t="ku"
+                      >{formatPrice(from, 'ku')}</span>
                   </span>
                 </p>
               )}
@@ -150,6 +157,7 @@ const HERO_PHOTOS = [
             <div class="meta">
               <h2 class="name-ar" data-t="ar" lang="ar" dir="rtl">الستات</h2>
               <p class="name-en" data-t="en" lang="en" dir="ltr">Sets</p>
+              <h2 class="name-ar" data-t="ku" lang="ku" dir="rtl">سێتەکان</h2>
               {setsFrom === Infinity ? (
                 <p class="from comingsoon"><T k="product.comingSoon" /></p>
               ) : (
@@ -157,7 +165,8 @@ const HERO_PHOTOS = [
                   <T k="grid.from" />{' '}
                   <span class="price">
                     <span data-t="ar">{formatPrice(setsFrom, 'ar')}</span><span data-t="en"
-                      >{formatPrice(setsFrom, 'en')}</span>
+                      >{formatPrice(setsFrom, 'en')}</span><span data-t="ku"
+                      >{formatPrice(setsFrom, 'ku')}</span>
                   </span>
                 </p>
               )}
@@ -167,8 +176,6 @@ const HERO_PHOTOS = [
       )}
     </ul>
   </section>
-
-  <BestSellers />
 </Layout>
 
 <script>

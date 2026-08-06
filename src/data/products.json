@@ -4,11 +4,13 @@
     "category": "scissors",
     "name_en": "Iris Scissors — Red Curved",
     "name_ar": "مقص آيرس أحمر منحني",
+    "name_ku": "قەیچی ئایریس — سوور و چەمدار",
     "spec_line_en": "Iris Scissors 12cm Curved — Natra",
     "price_iqd": 30000,
     "size": "12cm",
     "variant_en": "Curved",
     "variant_ar": "منحني",
+    "variant_ku": "چەمدار",
     "specs_en": [
       "Size: 12cm",
       "German stainless steel (Rostfrei)",
@@ -21,8 +23,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Curved tip for precise reach in small, delicate areas.",
     "benefit_ar": "منحني للوصول الأدق بالمناطق الصغيرة.",
+    "benefit_ku": "سەری چەمدار بۆ گەیشتنی وردتر لە شوێنی بچووک و ورد.",
     "in_stock": true,
     "low_stock": false,
     "best_seller": true,
@@ -34,11 +43,13 @@
     "category": "scissors",
     "name_en": "Iris Scissors — Straight",
     "name_ar": "مقص آيرس مستقيم",
+    "name_ku": "قەیچی ئایریس — ڕاست",
     "spec_line_en": "Iris Scissors 12cm Straight — Natra",
     "price_iqd": 20000,
     "size": "12cm",
     "variant_en": "Straight",
     "variant_ar": "مستقيم",
+    "variant_ku": "ڕاست",
     "specs_en": [
       "Size: 12cm",
       "German stainless steel (Rostfrei)",
@@ -51,8 +62,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Higher control for fine, precise cutting.",
     "benefit_ar": "تحكم أعلى وقص أدق.",
+    "benefit_ku": "کۆنترۆلی زیاتر بۆ بڕینی وردوباش.",
     "in_stock": true,
     "low_stock": false,
     "best_seller": true,
@@ -64,11 +82,13 @@
     "category": "scissors",
     "name_en": "Iris Scissors — Curved",
     "name_ar": "مقص آيرس منحني",
+    "name_ku": "قەیچی ئایریس — چەمدار",
     "spec_line_en": "Iris Scissors 12cm Curved — Natra",
     "price_iqd": 20000,
     "size": "12cm",
     "variant_en": "Curved",
     "variant_ar": "منحني",
+    "variant_ku": "چەمدار",
     "specs_en": [
       "Size: 12cm",
       "German stainless steel (Rostfrei)",
@@ -81,8 +101,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Curved tip for precise reach in small, delicate areas.",
     "benefit_ar": "منحني للوصول الأدق بالمناطق الصغيرة.",
+    "benefit_ku": "سەری چەمدار بۆ گەیشتنی وردتر لە شوێنی بچووک و ورد.",
     "in_stock": true,
     "low_stock": false,
     "is_set": false,
@@ -93,11 +120,13 @@
     "category": "scissors",
     "name_en": "Iris Scissors — Rainbow",
     "name_ar": "مقص آيرس رينبو",
+    "name_ku": "قەیچی ئایریس — ڕەنگی کۆمەڵ",
     "spec_line_en": "Iris Scissors 12cm Rainbow — Natra",
     "price_iqd": 30000,
     "size": "12cm",
     "variant_en": "Rainbow",
     "variant_ar": "رينبو",
+    "variant_ku": "ڕەنگی کۆمەڵ",
     "specs_en": [
       "Size: 12cm",
       "German stainless steel (Rostfrei)",
@@ -110,8 +139,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Color-coated finish for fast visual identification in a tray.",
     "benefit_ar": "طلاء ملون يسهل تمييزه بسرعة بين الأدوات.",
+    "benefit_ku": "ڕواڵەتی ڕەنگاوڕەنگ بۆ ناسینەوەی خێرا لەناو سینی ئامرازەکان.",
     "in_stock": true,
     "low_stock": true,
     "best_seller": true,
@@ -123,11 +159,13 @@
     "category": "scissors",
     "name_en": "Mayo Scissors — Curved",
     "name_ar": "مقص مايو منحني",
+    "name_ku": "قەیچی مایو — چەمدار",
     "spec_line_en": "Mayo Scissors 12cm Curved — Natra",
     "price_iqd": 30000,
     "size": "12cm",
     "variant_en": "Curved",
     "variant_ar": "منحني",
+    "variant_ku": "چەمدار",
     "specs_en": [
       "Size: 12cm",
       "German stainless steel (Rostfrei)",
@@ -140,8 +178,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Heavier blade built for cutting tissue and sutures.",
     "benefit_ar": "شفرة أقوى مخصصة لقص الأنسجة والخيوط الجراحية.",
+    "benefit_ku": "پەلێکی قورستر دروستکراوە بۆ بڕینی نسک و دەرزی.",
     "in_stock": true,
     "low_stock": false,
     "is_set": false,
@@ -152,11 +197,13 @@
     "category": "scissors",
     "name_en": "Metzenbaum Scissors — Blunt Curved",
     "name_ar": "مقص ميتزنباوم منحني كليل",
+    "name_ku": "قەیچی مێتزنباوم — کول و چەمدار",
     "spec_line_en": "Metzenbaum Scissors 12cm Blunt Curved — Natra",
     "price_iqd": 30000,
     "size": "12cm",
     "variant_en": "Blunt, Curved",
     "variant_ar": "منحني كليل",
+    "variant_ku": "کول، چەمدار",
     "specs_en": [
       "Size: 12cm",
       "Blunt tip",
@@ -171,8 +218,16 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "سەری کول",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Blunt curved tip for delicate tissue dissection.",
     "benefit_ar": "طرف كليل ومنحني لتشريح دقيق للأنسجة.",
+    "benefit_ku": "سەری کول و چەمدار بۆ جێبەجێکردنی وردی نسک.",
     "in_stock": true,
     "low_stock": false,
     "is_set": false,
@@ -183,11 +238,13 @@
     "category": "needle-holders",
     "name_en": "Halsey Needle Holder — TC",
     "name_ar": "ماسك إبر هالسي TC",
+    "name_ku": "گرتنەری دەرزی هالسی — TC",
     "spec_line_en": "Halsey Needle Holder 12.5cm TC — Natra",
     "price_iqd": 55000,
     "size": "12.5cm",
     "variant_en": "TC (Tungsten Carbide)",
     "variant_ar": "TC",
+    "variant_ku": "TC",
     "specs_en": [
       "Size: 12.5cm",
       "TC tips",
@@ -204,8 +261,17 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12.5 سم",
+      "سەرەکانی TC",
+      "قوفلی نەرم",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "TC tips for a stronger, more stable grip on the needle.",
     "benefit_ar": "أطراف TC لمسكة أقوى وثبات أعلى للإبرة.",
+    "benefit_ku": "سەرەکانی TC بۆ گرتنێکی بەهێزتر و جێگیرتر بۆ دەرزی.",
     "in_stock": true,
     "low_stock": false,
     "is_set": false,
@@ -216,11 +282,13 @@
     "category": "needle-holders",
     "name_en": "Mathieu Needle Holder — TC Gold",
     "name_ar": "ماسك إبر ماتيو TC ذهبي",
+    "name_ku": "گرتنەری دەرزی ماتیو — TC زێڕین",
     "spec_line_en": "Mathieu Needle Holder 14cm TC Gold — Natra",
     "price_iqd": 0,
     "size": "14cm",
     "variant_en": "TC Gold (Tungsten Carbide)",
     "variant_ar": "TC ذهبي",
+    "variant_ku": "TC زێڕین",
     "specs_en": [
       "Size: 14cm",
       "TC tips",
@@ -237,8 +305,17 @@
       "ستانلس ستيل ألماني (Rostfrei)",
       "علامة CE"
     ],
+    "specs_ku": [
+      "قەبارە: 14 سم",
+      "سەرەکانی TC",
+      "ئەڵقەی ڕوکەشکراو بە زێڕ",
+      "قوفلی سندوقی بە هەلپەڕکێ",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE"
+    ],
     "benefit_en": "Spring handle and TC tips give a firm, stable one-hand grip on the needle.",
     "benefit_ar": "مقبض نابض وأطراف TC لمسكة ثابتة بيد واحدة على الإبرة.",
+    "benefit_ku": "دەستەی هەلپەڕکێ و سەرەکانی TC گرتنێکی جێگیر بە یەک دەست بۆ دەرزی دەدەن.",
     "in_stock": false,
     "low_stock": false,
     "is_set": false,
@@ -250,6 +327,7 @@
     "category": "needle-holders",
     "name_en": "Castroviejo Needle Holder — Straight",
     "name_ar": "ماسك إبر كاستروفيجو مستقيم",
+    "name_ku": "گرتنەری دەرزی کاستروفیجو — ڕاست",
     "spec_line_en": "Castroviejo Needle Holder Straight 12cm & 14cm — Natra",
     "price_iqd": 0,
     "size": "12cm & 14cm",
@@ -267,8 +345,16 @@
       "ستانلس ستيل ألماني (Rostfrei)",
       "علامة CE"
     ],
+    "specs_ku": [
+      "قەبارەکان: 12 سم و 14 سم",
+      "چەقۆی ڕاست",
+      "دەستەی هەلپەڕکێ",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE"
+    ],
     "benefit_en": "Straight jaws and a spring handle for precise, one-hand needle control.",
     "benefit_ar": "فكوك مستقيمة ومقبض نابض للتحكم الدقيق بالإبرة بيد واحدة.",
+    "benefit_ku": "چەقۆی ڕاست و دەستەی هەلپەڕکێ بۆ کۆنترۆلی وردی دەرزی بە یەک دەست.",
     "in_stock": false,
     "low_stock": false,
     "is_set": false,
@@ -280,11 +366,13 @@
     "category": "forceps",
     "name_en": "Forceps — Curved",
     "name_ar": "فورسبس منحني",
+    "name_ku": "فورسێپس — چەمدار",
     "spec_line_en": "Forceps 12cm Curved — Natra",
     "price_iqd": 20000,
     "size": "12cm",
     "variant_en": "Curved",
     "variant_ar": "منحني",
+    "variant_ku": "چەمدار",
     "specs_en": [
       "Size: 12cm",
       "Non-slip grip",
@@ -299,8 +387,16 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "گرتنی دژە سررکردنەوە",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Aligned tips and non-slip grip for delicate tissue handling.",
     "benefit_ar": "أطراف متطابقة ومسكة ثابتة لتعامل دقيق مع الأنسجة.",
+    "benefit_ku": "سەرەکانی یەکسان و گرتنی دژە سررکردنەوە بۆ کارلێکی وردی نسک.",
     "in_stock": true,
     "low_stock": true,
     "is_set": false,
@@ -311,11 +407,13 @@
     "category": "forceps",
     "name_en": "Adson Toothed Forceps — Straight",
     "name_ar": "ملقط أدسون المسنن مستقيم",
+    "name_ku": "فورسێپسی ئادسۆنی ددان‌دار — ڕاست",
     "spec_line_en": "Adson Toothed Forceps 12cm Straight — Natra",
     "price_iqd": 25000,
     "size": "12cm",
     "variant_en": "Straight, Toothed",
     "variant_ar": "مستقيم مسنن",
+    "variant_ku": "ڕاست، ددان‌دار",
     "specs_en": [
       "Size: 12cm",
       "Toothed tip",
@@ -330,8 +428,16 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 12 سم",
+      "سەری ددان‌دار",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Toothed tip for a firm, secure hold on tissue.",
     "benefit_ar": "طرف مسنن لمسكة ثابتة وآمنة على الأنسجة.",
+    "benefit_ku": "سەری ددان‌دار بۆ گرتنێکی جێگیر و پارێزراو لەسەر نسک.",
     "in_stock": true,
     "low_stock": false,
     "is_set": false,
@@ -342,6 +448,7 @@
     "category": "hemostats",
     "name_en": "Kelly Hemostat",
     "name_ar": "مشبك كيلي",
+    "name_ku": "کلامپی کیلی",
     "spec_line_en": "Kelly Hemostat 15cm — Natra",
     "price_iqd": 30000,
     "size": "15cm",
@@ -357,8 +464,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "قەبارە: 15 سم",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Larger clamp built for controlling bigger vessels and tissue.",
     "benefit_ar": "مشبك أكبر مخصص للسيطرة على الأوعية والأنسجة الكبيرة.",
+    "benefit_ku": "کلامپێکی گەورەتر دروستکراوە بۆ کۆنترۆلکردنی خەڵکەوپێکردنی گەورەتر و نسک.",
     "in_stock": true,
     "low_stock": false,
     "is_set": false,
@@ -369,10 +483,12 @@
     "category": "sets",
     "name_en": "ENT Set — 3 Pieces",
     "name_ar": "ست الأنف والأذن والحنجرة — 3 قطع",
+    "name_ku": "سێتی گوێ و لووت و گەرووی — 3 پارچە",
     "spec_line_en": "ENT Set — 3 Pieces — Natra",
     "price_iqd": 100000,
     "specialty_en": "ENT",
     "specialty_ar": "أنف وأذن وحنجرة",
+    "specialty_ku": "گوێ و لووت و گەروو",
     "specs_en": [
       "3 pieces",
       "German stainless steel (Rostfrei)",
@@ -385,8 +501,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "3 پارچە",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Three Natra instruments supplied together as one set.",
     "benefit_ar": "ثلاث أدوات Natra تنباع سوية كست واحد.",
+    "benefit_ku": "سێ ئامرازی Natra کە پێکەوە وەک یەک سێت دەفروشرێن.",
     "in_stock": true,
     "low_stock": false,
     "is_set": true,
@@ -405,6 +528,11 @@
       "مقص آيرس رينبو منحني",
       "ماسك إبر هالسي، 12.5 سم",
       "ملقط أدسون المسنن مستقيم"
+    ],
+    "contents_ku": [
+      "قەیچی ئایریس — ڕەنگی کۆمەڵ، چەمدار",
+      "گرتنەری دەرزی هالسی، 12.5 سم",
+      "فورسێپسی ئادسۆنی ددان‌دار — ڕاست"
     ]
   },
   {
@@ -412,6 +540,7 @@
     "category": "sets",
     "name_en": "General Set — 3 Pieces",
     "name_ar": "الست العام — 3 قطع",
+    "name_ku": "سێتی گشتی — 3 پارچە",
     "spec_line_en": "General Set — 3 Pieces — Natra",
     "price_iqd": 80000,
     "specs_en": [
@@ -426,8 +555,15 @@
       "علامة CE",
       "نفحصه قبل الشحن"
     ],
+    "specs_ku": [
+      "3 پارچە",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE",
+      "پێش ناردن پشکنینی کوالیتی دەکرێت"
+    ],
     "benefit_en": "Three Natra instruments supplied together as one set.",
     "benefit_ar": "ثلاث أدوات Natra تنباع سوية كست واحد.",
+    "benefit_ku": "سێ ئامرازی Natra کە پێکەوە وەک یەک سێت دەفروشرێن.",
     "in_stock": true,
     "low_stock": false,
     "is_set": true,
@@ -445,6 +581,11 @@
       "مشبك كيلي، 15 سم، منحني",
       "مقص مايو منحني، 14 سم",
       "مقص ميتزنباوم منحني كليل، 14 سم"
+    ],
+    "contents_ku": [
+      "کلامپی کیلی، 15 سم، چەمدار",
+      "قەیچی مایو — چەمدار، 14 سم",
+      "قەیچی مێتزنباوم — کول و چەمدار، 14 سم"
     ]
   },
   {
@@ -452,6 +593,7 @@
     "category": "calipers",
     "name_en": "Castroviejo Caliper — Spring Gauge",
     "name_ar": "فرجار كاستروفيجو",
+    "name_ku": "کالیپەری کاستروفیجو — پێوانەی هەلپەڕکێ",
     "spec_line_en": "Castroviejo Gauge Spring Caliper 9cm — Natra",
     "price_iqd": 0,
     "size": "9cm",
@@ -471,8 +613,17 @@
       "ستانلس ستيل ألماني (Rostfrei)",
       "علامة CE"
     ],
+    "specs_ku": [
+      "قەبارە: 9 سم",
+      "پێوانەی دەرەجەبەندیکراو 0–40 ملم",
+      "هەلپەڕکێدار",
+      "پاسەوانی سەر بۆ پاراستن",
+      "پۆڵای بۆننەگیری ئەڵمانی (Rostfrei)",
+      "نیشانی CE"
+    ],
     "benefit_en": "Spring action and a 0–40mm scale for quick, precise measurements.",
     "benefit_ar": "نابض ذاتي وتدريج 0–40 ملم لقياسات سريعة ودقيقة.",
+    "benefit_ku": "کارکردنی هەلپەڕکێ و پێوانەی 0–40 ملم بۆ پێوانەی خێرا و وردوباش.",
     "in_stock": false,
     "low_stock": false,
     "is_set": false,

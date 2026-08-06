@@ -1,6 +1,6 @@
 ---
 /**
- * Renders one UI string in both languages; CSS shows the active one.
+ * Renders one UI string in all three languages; CSS shows the active one.
  * Keeps the page usable with JS disabled and avoids a translation flash.
  */
 import { t } from '../i18n/strings';
@@ -18,4 +18,8 @@ if (!entry) throw new Error(`Missing i18n key: ${k}`);
 <span class={cls} data-t="ar" lang="ar">{entry.ar}</span><span
   class={cls}
   data-t="en"
-  lang="en">{entry.en}</span>
+  lang="en">{entry.en}</span><span
+  class={cls}
+  data-t="ku"
+  lang="ku"
+  dir="rtl">{entry.ku}</span>

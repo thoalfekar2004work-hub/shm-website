@@ -8,14 +8,15 @@ const table = products.map((p) => ({
   slug: p.slug,
   ar: p.name_ar,
   en: p.name_en,
+  ku: p.name_ku ?? p.name_en,
   price: p.price_iqd,
   is_set: p.is_set,
 }));
 
 const labels = {
-  unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
-  total: { ar: t['cart.total'].ar, en: t['cart.total'].en },
-  free: { ar: t['price.free'].ar, en: t['price.free'].en },
+  unit: t['price.unit'],
+  total: t['cart.total'],
+  free: t['price.free'],
 };
 ---
 
@@ -57,10 +58,12 @@ const labels = {
   import { getLang } from '../scripts/i18n';
   import { deliveryFeeFor } from '../lib/order-shared';
 
-  type Row = { slug: string; ar: string; en: string; price: number; is_set?: boolean };
+  type Row = { slug: string; ar: string; en: string; ku: string; price: number; is_set?: boolean };
   const table: Row[] = JSON.parse(document.getElementById('product-table')?.textContent || '[]');
   const labels = JSON.parse(document.getElementById('or-labels')?.textContent || '{}');
   const byslug = new Map(table.map((r) => [r.slug, r]));
+  const nameFor = (p: Row, lang: 'ar' | 'en' | 'ku') =>
+    lang === 'ar' ? p.ar : lang === 'ku' ? p.ku : p.en;
 
   const wrap = document.getElementById('summary');
   const list = document.getElementById('sum-lines');
@@ -90,7 +93,7 @@ const labels = {
       total += sub;
       const li = document.createElement('li');
       li.innerHTML =
-        `<span>${lang === 'ar' ? p.ar : p.en}<span class="q"> × ${it.qty}</span></span>` +
+        `<span>${nameFor(p, lang)}<span class="q"> × ${it.qty}</span></span>` +
         `<span class="price">${sub.toLocaleString('en-US')} ${labels.unit[lang]}</span>`;
       list.appendChild(li);
     }

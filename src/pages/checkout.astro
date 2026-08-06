@@ -9,19 +9,20 @@ const table = products.map((p) => ({
   slug: p.slug,
   ar: p.name_ar,
   en: p.name_en,
+  ku: p.name_ku ?? p.name_en,
   sp: p.spec_line_en,
   price: p.price_iqd,
   is_set: p.is_set,
 }));
 
 const labels = {
-  unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
-  free: { ar: t['price.free'].ar, en: t['price.free'].en },
-  qty: { ar: t['cart.qty'].ar, en: t['cart.qty'].en },
-  required: { ar: t['checkout.required'].ar, en: t['checkout.required'].en },
-  phoneError: { ar: t['form.phoneError'].ar, en: t['form.phoneError'].en },
-  sending: { ar: t['checkout.sending'].ar, en: t['checkout.sending'].en },
-  submit: { ar: t['form.submit'].ar, en: t['form.submit'].en },
+  unit: t['price.unit'],
+  free: t['price.free'],
+  qty: t['cart.qty'],
+  required: t['checkout.required'],
+  phoneError: t['form.phoneError'],
+  sending: t['checkout.sending'],
+  submit: t['form.submit'],
 };
 ---
 
@@ -124,6 +125,7 @@ const labels = {
     slug: string;
     ar: string;
     en: string;
+    ku: string;
     sp: string;
     price: number;
     is_set?: boolean;
@@ -148,8 +150,10 @@ const labels = {
   /** Typed field lookup — every id below is a control rendered by this page. */
   const field = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
-  const money = (n: number, lang: 'ar' | 'en') =>
+  const money = (n: number, lang: 'ar' | 'en' | 'ku') =>
     `${n.toLocaleString('en-US')} ${labels.unit[lang]}`;
+  const nameFor = (p: Row, lang: 'ar' | 'en' | 'ku') =>
+    lang === 'ar' ? p.ar : lang === 'ku' ? p.ku : p.en;
 
   const validLines = () => readCart().filter((l) => byslug.has(l.slug));
 
@@ -170,7 +174,7 @@ const labels = {
       total += sub;
       const li = document.createElement('li');
       li.innerHTML =
-        `<span class="s-name">${lang === 'ar' ? p.ar : p.en}` +
+        `<span class="s-name">${nameFor(p, lang)}` +
         `<span class="s-qty"> × ${line.qty}</span></span>` +
         `<span class="s-sub price">${money(sub, lang)}</span>`;
       sumLines.appendChild(li);

@@ -16,19 +16,27 @@ export interface Product {
   category: string;
   name_en: string;
   name_ar: string;
+  /** Kurdish (Sorani) fields are optional and fall back to English where
+   * missing — see the note at the top of i18n/strings.ts about native review. */
+  name_ku?: string;
   spec_line_en: string;
   price_iqd: number;
   size?: string;
   variant_en?: string;
   variant_ar?: string;
+  variant_ku?: string;
   specialty_en?: string;
   specialty_ar?: string;
+  specialty_ku?: string;
   specs_en?: string[];
   specs_ar?: string[];
+  specs_ku?: string[];
   benefit_en?: string;
   benefit_ar?: string;
+  benefit_ku?: string;
   contents_en?: string[];
   contents_ar?: string[];
+  contents_ku?: string[];
   in_stock: boolean;
   low_stock: boolean;
   is_set: boolean;
@@ -61,6 +69,7 @@ export interface Category {
   slug: string;
   name_en: string;
   name_ar: string;
+  name_ku?: string;
   tile_product: string;
   sort: number;
 }
@@ -166,9 +175,6 @@ export function productsInCategory(categorySlug: string): Product[] {
 
 export const sets = products.filter((p) => p.is_set);
 
-/** Products the owner has flagged as best sellers, in catalog order. */
-export const bestSellers = products.filter((p) => p.best_seller);
-
 /**
  * Whether an offer is still running. Called at build time for the initial
  * render; the client re-checks on a timer and removes the offer when it ends,
@@ -193,27 +199,39 @@ export function lowestPriceIn(categorySlug: string): number {
 }
 
 export function name(p: Product, lang: Lang): string {
-  return lang === 'ar' ? p.name_ar : p.name_en;
+  if (lang === 'ar') return p.name_ar;
+  if (lang === 'ku') return p.name_ku ?? p.name_en;
+  return p.name_en;
 }
 
 export function specs(p: Product, lang: Lang): string[] {
-  return (lang === 'ar' ? p.specs_ar : p.specs_en) ?? [];
+  if (lang === 'ar') return p.specs_ar ?? [];
+  if (lang === 'ku') return p.specs_ku ?? p.specs_en ?? [];
+  return p.specs_en ?? [];
 }
 
 export function benefit(p: Product, lang: Lang): string | undefined {
-  return lang === 'ar' ? p.benefit_ar : p.benefit_en;
+  if (lang === 'ar') return p.benefit_ar;
+  if (lang === 'ku') return p.benefit_ku ?? p.benefit_en;
+  return p.benefit_en;
 }
 
 export function contents(p: Product, lang: Lang): string[] {
-  return (lang === 'ar' ? p.contents_ar : p.contents_en) ?? [];
+  if (lang === 'ar') return p.contents_ar ?? [];
+  if (lang === 'ku') return p.contents_ku ?? p.contents_en ?? [];
+  return p.contents_en ?? [];
 }
 
 export function specialty(p: Product, lang: Lang): string | undefined {
-  return lang === 'ar' ? p.specialty_ar : p.specialty_en;
+  if (lang === 'ar') return p.specialty_ar;
+  if (lang === 'ku') return p.specialty_ku ?? p.specialty_en;
+  return p.specialty_en;
 }
 
 export function categoryName(c: Category, lang: Lang): string {
-  return lang === 'ar' ? c.name_ar : c.name_en;
+  if (lang === 'ar') return c.name_ar;
+  if (lang === 'ku') return c.name_ku ?? c.name_en;
+  return c.name_en;
 }
 
 /**
@@ -233,6 +251,7 @@ export const searchIndex = products.map((p) => ({
   s: p.slug,
   ar: p.name_ar,
   en: p.name_en,
+  ku: p.name_ku ?? p.name_en,
   sp: p.spec_line_en,
   p: p.price_iqd,
   cs: p.coming_soon ?? false,

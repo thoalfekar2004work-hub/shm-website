@@ -1,6 +1,6 @@
 ---
 import T from './T.astro';
-import { searchIndex, products } from '../lib/catalog';
+import { searchIndex } from '../lib/catalog';
 import { t } from '../i18n/strings';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
@@ -9,9 +9,9 @@ const isSets = path.startsWith('/sets');
 
 // Small inlined index — name_ar + name_en + spec_line_en, per spec §4.
 const index = JSON.stringify(searchIndex);
-const priceUnit = { ar: t['price.unit'].ar, en: t['price.unit'].en };
-const noResults = { ar: t['search.noResults'].ar, en: t['search.noResults'].en };
-const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon'].en };
+const priceUnit = t['price.unit'];
+const noResults = t['search.noResults'];
+const comingSoon = t['product.comingSoon'];
 ---
 
 <header class="nav">
@@ -37,6 +37,7 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
         aria-controls="search-panel"
         data-arialabel-ar={t['nav.openSearch'].ar}
         data-arialabel-en={t['nav.openSearch'].en}
+        data-arialabel-ku={t['nav.openSearch'].ku}
         aria-label={t['nav.openSearch'].ar}>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -49,6 +50,7 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
         class="iconbtn cartbtn"
         data-arialabel-ar={t['nav.cart'].ar}
         data-arialabel-en={t['nav.cart'].en}
+        data-arialabel-ku={t['nav.cart'].ku}
         aria-label={t['nav.cart'].ar}>
         <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -58,15 +60,30 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
         <span class="cartcount" data-cart-count hidden></span>
       </a>
 
-      <button
-        type="button"
-        class="langbtn"
-        data-lang-toggle
-        data-arialabel-ar={t['nav.language'].ar}
-        data-arialabel-en={t['nav.language'].en}
-        aria-label={t['nav.language'].ar}>
-        <span data-t="ar">EN</span><span data-t="en">ع</span>
-      </button>
+      <div class="langmenu" data-lang-menu>
+        <button
+          type="button"
+          class="langbtn"
+          id="lang-toggle"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="lang-listbox"
+          data-arialabel-ar={t['nav.language'].ar}
+          data-arialabel-en={t['nav.language'].en}
+          data-arialabel-ku={t['nav.language'].ku}
+          aria-label={t['nav.language'].ar}>
+          <span data-lang-code>EN</span>
+          <svg class="chev" viewBox="0 0 24 24" width="13" height="13" aria-hidden="true" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m6 9 6 6 6-6"></path>
+          </svg>
+        </button>
+        <ul class="langlist" id="lang-listbox" role="listbox" aria-label={t['nav.language'].ar} hidden>
+          <li role="option" data-lang-option="en" lang="en" dir="ltr">English</li>
+          <li role="option" data-lang-option="ar" lang="ar" dir="rtl">العربية</li>
+          <li role="option" data-lang-option="ku" lang="ku" dir="rtl">کوردی</li>
+        </ul>
+      </div>
 
       <button
         type="button"
@@ -74,6 +91,7 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
         data-theme-toggle
         data-arialabel-ar={t['nav.darkMode'].ar}
         data-arialabel-en={t['nav.darkMode'].en}
+        data-arialabel-ku={t['nav.darkMode'].ku}
         aria-label={t['nav.darkMode'].ar}>
         <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -96,9 +114,11 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
         autocomplete="off"
         data-placeholder-ar={t['search.placeholder'].ar}
         data-placeholder-en={t['search.placeholder'].en}
+        data-placeholder-ku={t['search.placeholder'].ku}
         placeholder={t['search.placeholder'].ar}
         data-arialabel-ar={t['search.placeholder'].ar}
         data-arialabel-en={t['search.placeholder'].en}
+        data-arialabel-ku={t['search.placeholder'].ku}
         aria-label={t['search.placeholder'].ar}
       />
       <ul id="search-results" class="results" role="listbox"></ul>
@@ -120,8 +140,66 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
 />
 
 <script>
-  import { getLang } from '../scripts/i18n';
+  import { getLang, setLang, type Lang } from '../scripts/i18n';
 
+  // --- language picker menu -------------------------------------------------
+  const langMenu = document.querySelector<HTMLElement>('[data-lang-menu]');
+  const langToggle = document.getElementById('lang-toggle') as HTMLButtonElement | null;
+  const langListbox = document.getElementById('lang-listbox') as HTMLUListElement | null;
+  const langCode = langToggle?.querySelector<HTMLElement>('[data-lang-code]');
+  const CODE: Record<Lang, string> = { en: 'EN', ar: 'AR', ku: 'KU' };
+
+  function paintLangMenu() {
+    const lang = getLang();
+    if (langCode) langCode.textContent = CODE[lang];
+    langListbox?.querySelectorAll<HTMLLIElement>('[data-lang-option]').forEach((li) => {
+      const active = li.dataset.langOption === lang;
+      li.setAttribute('aria-selected', String(active));
+      li.classList.toggle('active', active);
+    });
+  }
+
+  function openLangMenu() {
+    if (!langListbox || !langToggle) return;
+    langListbox.hidden = false;
+    langToggle.setAttribute('aria-expanded', 'true');
+  }
+  function closeLangMenu() {
+    if (!langListbox || !langToggle) return;
+    langListbox.hidden = true;
+    langToggle.setAttribute('aria-expanded', 'false');
+  }
+
+  langToggle?.addEventListener('click', () => {
+    if (langListbox?.hidden) openLangMenu();
+    else closeLangMenu();
+  });
+
+  langListbox?.querySelectorAll<HTMLLIElement>('[data-lang-option]').forEach((li) => {
+    li.addEventListener('click', () => {
+      const lang = li.dataset.langOption as Lang;
+      setLang(lang);
+      closeLangMenu();
+      langToggle?.focus();
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (langListbox && !langListbox.hidden && !langMenu?.contains(e.target as Node)) {
+      closeLangMenu();
+    }
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && langListbox && !langListbox.hidden) {
+      closeLangMenu();
+      langToggle?.focus();
+    }
+  });
+
+  paintLangMenu();
+  document.addEventListener('shm:langchange', paintLangMenu);
+
+  // --- search ----------------------------------------------------------------
   const toggle = document.getElementById('search-toggle') as HTMLButtonElement | null;
   const panel = document.getElementById('search-panel');
   const input = document.getElementById('search-input') as HTMLInputElement | null;
@@ -130,7 +208,7 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
   const labelEl = document.getElementById('search-labels');
 
   if (toggle && panel && input && list && indexEl && labelEl) {
-    type Row = { s: string; ar: string; en: string; sp: string; p: number; cs: boolean };
+    type Row = { s: string; ar: string; en: string; ku: string; sp: string; p: number; cs: boolean };
     const index: Row[] = JSON.parse(indexEl.textContent || '[]');
     const labels = JSON.parse(labelEl.textContent || '{}');
 
@@ -173,7 +251,13 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
 
       const lang = getLang();
       const hits = index
-        .filter((r) => norm(r.ar).includes(q) || norm(r.en).includes(q) || norm(r.sp).includes(q))
+        .filter(
+          (r) =>
+            norm(r.ar).includes(q) ||
+            norm(r.en).includes(q) ||
+            norm(r.ku).includes(q) ||
+            norm(r.sp).includes(q),
+        )
         .slice(0, 8);
 
       if (!hits.length) {
@@ -191,8 +275,9 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
         const priceHtml = r.cs
           ? `<span class="r-price">${labels.comingSoon[lang]}</span>`
           : `<span class="r-price price">${r.p.toLocaleString('en-US')} ${labels.priceUnit[lang]}</span>`;
+        const name = lang === 'ar' ? r.ar : lang === 'ku' ? r.ku : r.en;
         a.innerHTML =
-          `<span class="r-name">${lang === 'ar' ? r.ar : r.en}</span>` +
+          `<span class="r-name">${name}</span>` +
           `<span class="r-spec">${r.sp}</span>` +
           priceHtml;
         li.appendChild(a);
@@ -302,11 +387,53 @@ const comingSoon = { ar: t['product.comingSoon'].ar, en: t['product.comingSoon']
   html[data-theme='dark'] .icon-moon { display: none; }
   html[data-theme='dark'] .icon-sun { display: block; }
 
+  .langmenu {
+    position: relative;
+  }
+
   .langbtn {
     font-weight: 700;
     font-size: var(--fs-sm);
     padding-inline: var(--s3);
     border: 1px solid var(--border);
+    gap: 4px;
+  }
+  .langbtn .chev {
+    transition: transform 160ms var(--ease);
+  }
+  .langbtn[aria-expanded='true'] .chev {
+    transform: rotate(180deg);
+  }
+
+  .langlist {
+    position: absolute;
+    inset-block-start: calc(100% + var(--s2));
+    inset-inline-end: 0;
+    z-index: 110;
+    min-width: 140px;
+    padding: var(--s2);
+    display: grid;
+    gap: 2px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+  }
+  .langlist li {
+    padding: var(--s3);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    text-align: start;
+  }
+  .langlist li:hover {
+    background: var(--border);
+  }
+  .langlist li.active {
+    background: var(--red-cta);
+    color: var(--white);
   }
 
   .cartcount {
