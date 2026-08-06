@@ -9,11 +9,13 @@ const table = products.map((p) => ({
   ar: p.name_ar,
   en: p.name_en,
   price: p.price_iqd,
+  is_set: p.is_set,
 }));
 
 const labels = {
   unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
   total: { ar: t['cart.total'].ar, en: t['cart.total'].en },
+  free: { ar: t['price.free'].ar, en: t['price.free'].en },
 };
 ---
 
@@ -53,9 +55,9 @@ const labels = {
 
 <script>
   import { getLang } from '../scripts/i18n';
-  import { DELIVERY_FEE_IQD } from '../lib/order-shared';
+  import { deliveryFeeFor } from '../lib/order-shared';
 
-  type Row = { slug: string; ar: string; en: string; price: number };
+  type Row = { slug: string; ar: string; en: string; price: number; is_set?: boolean };
   const table: Row[] = JSON.parse(document.getElementById('product-table')?.textContent || '[]');
   const labels = JSON.parse(document.getElementById('or-labels')?.textContent || '{}');
   const byslug = new Map(table.map((r) => [r.slug, r]));
@@ -92,12 +94,16 @@ const labels = {
         `<span class="price">${sub.toLocaleString('en-US')} ${labels.unit[lang]}</span>`;
       list.appendChild(li);
     }
+    const deliveryFee = deliveryFeeFor(items.map((it) => byslug.get(it.slug)!));
     const deliveryEl = document.getElementById('sum-delivery');
     if (deliveryEl) {
-      deliveryEl.textContent = `${DELIVERY_FEE_IQD.toLocaleString('en-US')} ${labels.unit[lang]}`;
+      deliveryEl.textContent =
+        deliveryFee > 0
+          ? `${deliveryFee.toLocaleString('en-US')} ${labels.unit[lang]}`
+          : labels.free[lang];
     }
     totalEl.textContent =
-      `${(total + DELIVERY_FEE_IQD).toLocaleString('en-US')} ${labels.unit[lang]}`;
+      `${(total + deliveryFee).toLocaleString('en-US')} ${labels.unit[lang]}`;
   }
 
   document.addEventListener('shm:langchange', render);

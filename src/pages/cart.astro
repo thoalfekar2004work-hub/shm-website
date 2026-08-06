@@ -23,6 +23,7 @@ const table = products.map((p) => ({
   sp: p.spec_line_en,
   price: p.price_iqd,
   img: thumbs[p.slug],
+  is_set: p.is_set,
 }));
 
 const labels = {
@@ -31,6 +32,7 @@ const labels = {
   increase: { ar: t['cart.increase'].ar, en: t['cart.increase'].en },
   decrease: { ar: t['cart.decrease'].ar, en: t['cart.decrease'].en },
   unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
+  free: { ar: t['price.free'].ar, en: t['price.free'].en },
 };
 ---
 
@@ -79,9 +81,17 @@ const labels = {
 <script>
   import { readCart, setQty, removeFromCart } from '../scripts/cart';
   import { getLang } from '../scripts/i18n';
-  import { DELIVERY_FEE_IQD } from '../lib/order-shared';
+  import { deliveryFeeFor } from '../lib/order-shared';
 
-  type Row = { slug: string; ar: string; en: string; sp: string; price: number; img: string };
+  type Row = {
+    slug: string;
+    ar: string;
+    en: string;
+    sp: string;
+    price: number;
+    img: string;
+    is_set?: boolean;
+  };
 
   const table: Row[] = JSON.parse(
     document.getElementById('product-table')?.textContent || '[]',
@@ -145,9 +155,13 @@ const labels = {
 
     // Delivery is a flat charge the customer pays; the server charges the
     // same amount, so what they see here is what they get asked for.
+    const deliveryFee = deliveryFeeFor(lines.map((l) => byslug.get(l.slug)!));
     if (subtotalEl) subtotalEl.textContent = money(total, lang);
-    if (deliveryEl) deliveryEl.textContent = money(DELIVERY_FEE_IQD, lang);
-    totalEl.textContent = money(total + DELIVERY_FEE_IQD, lang);
+    if (deliveryEl) {
+      deliveryEl.textContent =
+        deliveryFee > 0 ? money(deliveryFee, lang) : labels.free[lang];
+    }
+    totalEl.textContent = money(total + deliveryFee, lang);
   }
 
   document.addEventListener('click', (e) => {

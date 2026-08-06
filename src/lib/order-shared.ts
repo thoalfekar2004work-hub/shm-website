@@ -19,6 +19,16 @@ export const LIMITS = {
 export const DELIVERY_FEE_IQD = 5000;
 
 /**
+ * Delivery is free when the order includes any set — the set's own page
+ * advertises this, so checkout has to actually honor it. One free-delivery
+ * item in a mixed cart waives the flat fee for the whole order rather than
+ * trying to prorate a charge that was never itemized per line.
+ */
+export function deliveryFeeFor(items: { is_set?: boolean }[]): number {
+  return items.some((it) => it.is_set) ? 0 : DELIVERY_FEE_IQD;
+}
+
+/**
  * Iraqi keyboards default to Arabic-Indic digits (٠١٢٣٤٥٦٧٨٩), so a phone
  * number typed while the keyboard is in Arabic mode arrives full of those,
  * not "0-9" — without this, a completely valid number fails validation for

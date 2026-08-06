@@ -74,6 +74,10 @@ export const t: Dict = {
     ar: 'توصيل لكل محافظات العراق — 5,000 د.ع',
     en: 'Delivery anywhere in Iraq — 5,000 IQD',
   },
+  'cart.deliveryNoteFree': {
+    ar: 'توصيل مجاني لكل محافظات العراق',
+    en: 'Free delivery anywhere in Iraq',
+  },
   'cart.codNote': {
     ar: 'الدفع عند الاستلام — نتواصل وياك للتأكيد قبل الشحن',
     en: 'Cash on delivery — we message you to confirm before shipping',
@@ -102,6 +106,9 @@ export const t: Dict = {
   },
   'search.placeholder': { ar: 'دور على أداة...', en: 'Search instruments...' },
   'price.unit': { ar: 'د.ع', en: 'IQD' },
+  'price.free': { ar: 'مجاني', en: 'Free' },
+  'product.freeDelivery': { ar: 'توصيل مجاني', en: 'Free Delivery' },
+  'showcase.mostOrdered': { ar: 'الأكثر طلباً من الأطباء', en: 'Most Ordered by Doctors' },
 
   // --- supporting UI strings (not in Appendix A, same register) ---
   'nav.openSearch': { ar: 'بحث', en: 'Search' },

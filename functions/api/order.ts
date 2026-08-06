@@ -10,7 +10,7 @@
  *   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, NOTION_TOKEN, NOTION_ORDERS_DB_ID
  */
 import productsData from '../../src/data/products.json';
-import { validateOrder, DELIVERY_FEE_IQD } from '../../src/lib/order-shared';
+import { validateOrder, deliveryFeeFor } from '../../src/lib/order-shared';
 
 /**
  * Exported so src/worker.ts (the real production entry point — see its
@@ -33,6 +33,7 @@ interface CatalogProduct {
   spec_line_en: string;
   price_iqd: number;
   size?: string;
+  is_set?: boolean;
 }
 
 const products = productsData as CatalogProduct[];
@@ -84,8 +85,10 @@ async function handleOrder(request: Request, env: Env): Promise<Response> {
     return { ...it, product: p, subtotal };
   });
   const goodsTotal = lines.reduce((sum, l) => sum + l.subtotal, 0);
-  // Flat delivery charge, same for every governorate, paid on delivery.
-  const total = goodsTotal + DELIVERY_FEE_IQD;
+  // Flat delivery charge, same for every governorate — waived when the
+  // order includes a set.
+  const deliveryFee = deliveryFeeFor(lines.map((l) => l.product));
+  const total = goodsTotal + deliveryFee;
 
   if (!env.TELEGRAM_BOT_TOKEN || !env.TELEGRAM_CHAT_ID) {
     console.error('[order] Telegram env vars are not configured');
@@ -111,7 +114,9 @@ async function handleOrder(request: Request, env: Env): Promise<Response> {
     itemLines,
     '',
     `🧾 مجموع المنتجات: ${money(goodsTotal)} IQD`,
-    `🚚 التوصيل: ${money(DELIVERY_FEE_IQD)} IQD`,
+    deliveryFee > 0
+      ? `🚚 التوصيل: ${money(deliveryFee)} IQD`
+      : '🚚 التوصيل: مجاني',
     `💰 المجموع: ${money(total)} IQD`,
     `🕐 ${baghdadTimestamp(new Date())}`,
   ].join('\n');
@@ -164,7 +169,7 @@ async function handleOrder(request: Request, env: Env): Promise<Response> {
                     // Delivery is listed so the row reconciles with Total IQD.
                     content: [
                       ...lines.map((l) => `${l.slug} ×${l.qty} = ${money(l.subtotal)}`),
-                      `delivery = ${money(DELIVERY_FEE_IQD)}`,
+                      `delivery = ${money(deliveryFee)}`,
                     ].join('\n'),
                   },
                 },

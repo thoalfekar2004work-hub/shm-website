@@ -186,10 +186,15 @@ const jsonLd = {
         {p.coming_soon ? (
           <p class="bigprice comingsoon"><T k="product.comingSoon" /></p>
         ) : (
-          <p class="bigprice"><Price product={p} /></p>
+          <p class="bigprice">
+            <Price product={p} />
+            {p.is_set && (
+              <span class="freedelivery"><T k="product.freeDelivery" /></span>
+            )}
+          </p>
         )}
 
-        {onOffer && p.promo && (
+        {onOffer && p.promo && !p.is_set && (
           <div class="offerbox" data-promo-part>
             <Countdown ends={p.promo.ends} />
           </div>
@@ -273,7 +278,9 @@ const jsonLd = {
             <a class="tocart" id="to-cart" href="/cart" hidden>
               <T k="product.viewCart" /> →
             </a>
-            <span class="deliv"><T k="cart.deliveryNote" /></span>
+            <span class="deliv">
+              <T k={p.is_set ? 'cart.deliveryNoteFree' : 'cart.deliveryNote'} />
+            </span>
           </p>
         )}
       </section>
@@ -517,6 +524,14 @@ const jsonLd = {
     text-align: start;
   }
   .bigprice.comingsoon { color: var(--gray-700); }
+
+  .freedelivery {
+    margin-inline-start: var(--s3);
+    font-size: var(--fs-base);
+    font-weight: 700;
+    color: var(--navy);
+    vertical-align: middle;
+  }
 
   .offerbox {
     margin-block-end: var(--s5);

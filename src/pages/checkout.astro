@@ -11,10 +11,12 @@ const table = products.map((p) => ({
   en: p.name_en,
   sp: p.spec_line_en,
   price: p.price_iqd,
+  is_set: p.is_set,
 }));
 
 const labels = {
   unit: { ar: t['price.unit'].ar, en: t['price.unit'].en },
+  free: { ar: t['price.free'].ar, en: t['price.free'].en },
   qty: { ar: t['cart.qty'].ar, en: t['cart.qty'].en },
   required: { ar: t['checkout.required'].ar, en: t['checkout.required'].en },
   phoneError: { ar: t['form.phoneError'].ar, en: t['form.phoneError'].en },
@@ -116,9 +118,16 @@ const labels = {
 <script>
   import { readCart, clearCart } from '../scripts/cart';
   import { getLang } from '../scripts/i18n';
-  import { normalizePhone, PHONE_RE, DELIVERY_FEE_IQD } from '../lib/order-shared';
+  import { normalizePhone, PHONE_RE, deliveryFeeFor } from '../lib/order-shared';
 
-  type Row = { slug: string; ar: string; en: string; sp: string; price: number };
+  type Row = {
+    slug: string;
+    ar: string;
+    en: string;
+    sp: string;
+    price: number;
+    is_set?: boolean;
+  };
 
   const table: Row[] = JSON.parse(document.getElementById('product-table')?.textContent || '[]');
   const labels = JSON.parse(document.getElementById('co-labels')?.textContent || '{}');
@@ -166,9 +175,13 @@ const labels = {
         `<span class="s-sub price">${money(sub, lang)}</span>`;
       sumLines.appendChild(li);
     }
+    const deliveryFee = deliveryFeeFor(lines.map((l) => byslug.get(l.slug)!));
     if (sumSubtotal) sumSubtotal.textContent = money(total, lang);
-    if (sumDelivery) sumDelivery.textContent = money(DELIVERY_FEE_IQD, lang);
-    sumTotal.textContent = money(total + DELIVERY_FEE_IQD, lang);
+    if (sumDelivery) {
+      sumDelivery.textContent =
+        deliveryFee > 0 ? money(deliveryFee, lang) : labels.free[lang];
+    }
+    sumTotal.textContent = money(total + deliveryFee, lang);
   }
 
   // --- validation ----------------------------------------------------------
@@ -221,6 +234,7 @@ const labels = {
       total += sub;
       return `• ${p.ar} — ${p.sp} ×${l.qty} = ${sub.toLocaleString('en-US')} IQD`;
     });
+    const deliveryFee = deliveryFeeFor(lines.map((l) => byslug.get(l.slug)!));
 
     const body = [
       'طلب من موقع SHM',
@@ -233,8 +247,10 @@ const labels = {
       'المنتجات:',
       ...items,
       '',
-      `التوصيل: ${DELIVERY_FEE_IQD.toLocaleString('en-US')} IQD`,
-      `المجموع: ${(total + DELIVERY_FEE_IQD).toLocaleString('en-US')} IQD`,
+      deliveryFee > 0
+        ? `التوصيل: ${deliveryFee.toLocaleString('en-US')} IQD`
+        : 'التوصيل: مجاني',
+      `المجموع: ${(total + deliveryFee).toLocaleString('en-US')} IQD`,
     ].join('\n');
 
     return `https://wa.me/${waNumber}?text=${encodeURIComponent(body)}`;

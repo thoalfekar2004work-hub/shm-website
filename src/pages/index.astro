@@ -18,7 +18,6 @@ import {
   HERO_LINE_2,
   HERO_LINE_1_AR,
   HERO_LINE_2_AR,
-  PROOF_POINTS,
   formatPrice,
 } from '../i18n/strings';
 
@@ -93,18 +92,6 @@ const HERO_PHOTOS = [
       </div>
     </div>
   </section>
-
-  <div class="proofstrip">
-    <ul class="wrap proof-list">
-      {PROOF_POINTS.map((point) => (
-        <li>
-          <span aria-hidden="true">✅</span>
-          <span data-t="ar" lang="ar" dir="rtl">{point.ar}</span><span data-t="en" lang="en" dir="ltr"
-            >{point.en}</span>
-        </li>
-      ))}
-    </ul>
-  </div>
 
   <Showcase />
 
@@ -254,24 +241,6 @@ const HERO_PHOTOS = [
 
   .hero-cta {
     margin-block-start: var(--s6);
-  }
-
-  .proofstrip {
-    background: var(--navy);
-    color: var(--white);
-    font-size: var(--fs-sm);
-    padding-block: var(--s4);
-  }
-
-  .proof-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s2) var(--s6);
-  }
-  .proof-list li {
-    display: flex;
-    align-items: center;
-    gap: var(--s2);
   }
 
   .catalog {

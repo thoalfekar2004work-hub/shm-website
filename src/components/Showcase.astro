@@ -25,6 +25,11 @@ const panels = SEQUENCE.map((slug) => {
 
 <section class="showcase" aria-label="Featured instruments">
   <div class="wrap">
+    <p class="mostordered">
+      <span data-t="ar" lang="ar" dir="rtl">{t['showcase.mostOrdered'].ar}</span><span data-t="en"
+        lang="en" dir="ltr">{t['showcase.mostOrdered'].en}</span>
+    </p>
+    <div class="glowbox">
     <ul class="panels">
       {panels.map(({ product: p, hero, benefitAr, benefitEn }, i) => (
         <li class="panel">
@@ -61,6 +66,7 @@ const panels = SEQUENCE.map((slug) => {
         </li>
       ))}
     </ul>
+    </div>
   </div>
 </section>
 
@@ -69,6 +75,28 @@ const panels = SEQUENCE.map((slug) => {
     background: var(--navy);
     color: var(--white);
     padding-block: var(--s8);
+  }
+
+  .mostordered {
+    margin-block-end: var(--s6);
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    text-align: center;
+    color: var(--white);
+  }
+
+  .glowbox {
+    border-radius: var(--radius);
+    padding: var(--s6);
+    box-shadow: 0 0 0 1px rgb(90 160 255 / 35%), 0 0 24px 4px rgb(70 140 255 / 25%);
+    animation: glow-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 0 1px rgb(90 160 255 / 30%), 0 0 20px 2px rgb(70 140 255 / 18%); }
+    50% { box-shadow: 0 0 0 1px rgb(120 180 255 / 55%), 0 0 40px 10px rgb(70 140 255 / 40%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .glowbox { animation: none; box-shadow: 0 0 0 1px rgb(90 160 255 / 40%), 0 0 28px 6px rgb(70 140 255 / 28%); }
   }
 
   .panels {

@@ -53,7 +53,12 @@ const onOffer = promoActive(product);
     {product.coming_soon ? (
       <p class="pricerow comingsoon"><T k="product.comingSoon" /></p>
     ) : (
-      <p class="pricerow"><Price product={product} /></p>
+      <p class="pricerow">
+        <Price product={product} />
+        {product.is_set && (
+          <span class="freedelivery"><T k="product.freeDelivery" /></span>
+        )}
+      </p>
     )}
   </div>
 </a>
@@ -142,6 +147,13 @@ const onOffer = promoActive(product);
   .pricerow.comingsoon {
     color: var(--gray-700);
     font-weight: 600;
+  }
+  .freedelivery {
+    display: block;
+    margin-block-start: 2px;
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    color: var(--navy);
   }
 
   /* Desktop-only lift; no bounce, no scale gimmicks (spec §6). */
