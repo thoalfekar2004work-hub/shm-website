@@ -22,7 +22,7 @@ export const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_INTL}`;
 export const INSTAGRAM_URL = 'https://www.instagram.com/shm_1q/';
 export const FACEBOOK_URL = 'https://www.facebook.com/SHM.I0';
 
-export const SITE_URL = 'https://shm-website.pages.dev';
+export const SITE_URL = 'https://shm-website.thoalfekar2004work.workers.dev';
 
 /** The three trust claims shown as a checklist (proof strip, footer). */
 export const PROOF_POINTS: { ar: string; en: string }[] = [
