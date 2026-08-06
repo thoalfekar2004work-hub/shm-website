@@ -395,7 +395,17 @@
       "ends": "2026-08-10T21:00:00+03:00"
     },
     "_note": "EXAMPLE OFFER — confirm or delete before sharing the site. was_iqd 110,000 comes from your own set graphic; the end date is a placeholder. Deleting the \"promo\" block removes the badge, the struck price and the countdown.",
-    "sort": 200
+    "sort": 200,
+    "contents_en": [
+      "Iris Scissors — Rainbow, Curved",
+      "Halsey Needle Holder, 12.5cm",
+      "Adson Toothed Forceps — Straight"
+    ],
+    "contents_ar": [
+      "مقص آيرس رينبو منحني",
+      "ماسك إبر هالسي، 12.5 سم",
+      "ملقط أدسون المسنن مستقيم"
+    ]
   },
   {
     "slug": "set-general",
@@ -446,7 +456,7 @@
     "specs_ar": [
       "القياس: 9 سم",
       "تدريج 0–40 ملم",
-      "نابض ذاتي الفتح",
+      "سبرنكَ لف",
       "واقيات أطراف",
       "ستانلس ستيل ألماني (Rostfrei)",
       "علامة CE"
