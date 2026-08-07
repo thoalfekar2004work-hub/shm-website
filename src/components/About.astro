@@ -1,0 +1,129 @@
+---
+/**
+ * Founder's "About" note — the owner's own words, in English/Arabic (as
+ * given) plus a drafted Kurdish translation (unreviewed, same caveat as the
+ * rest of the Kurdish rollout — see i18n/strings.ts). Sits at the very
+ * bottom of the homepage, above the footer.
+ */
+---
+
+<section class="about" aria-label="About SHM">
+  <div class="wrap">
+    <div data-t="en" class="body-en" lang="en" dir="ltr">
+      <h2 class="h">About SHM</h2>
+      <p>
+        SHM (Surgical Health Medical Supply) was founded in 2021 with one
+        goal: give doctors instruments they can trust without hesitation.
+      </p>
+      <p>
+        I'm a medical student, and that's not a side detail — it's why SHM
+        exists. I understand what a surgeon needs from their instruments
+        because I'm training to be one. Every product we carry is chosen and
+        checked with that standard in mind.
+      </p>
+      <p>
+        We supply Natra-brand surgical instruments — CE marked, Rostfrei
+        stainless steel, quality-checked before every shipment goes out. If
+        something isn't right, we exchange it. No arguments, no excuses.
+      </p>
+      <p>
+        Our long-term goal is to become a licensed distributor for leading
+        medical instrument manufacturers — earning that status the same way
+        we earn every customer's trust: through consistency, not shortcuts.
+      </p>
+      <p>
+        We're not chasing the cheapest price. We're building the supplier
+        you don't have to think twice about.
+      </p>
+    </div>
+
+    <div data-t="ar" class="body-ar" lang="ar" dir="rtl">
+      <h2 class="h">عن SHM</h2>
+      <p>
+        تأسست SHM (Surgical Health Medical Supply) عام 2021 بهدف واحد: تقديم
+        أدوات جراحية يثق بها الطبيب دون تردد.
+      </p>
+      <p>
+        أنا طالب طب، وهذا التفصيل مو جانبي — هو سبب وجود SHM. أفهم شنو يحتاجه
+        الجراح من أدواته لأني أتدرب لأكون واحد منهم. كل منتج نوفره ينتقى
+        ويفحص على هذا الأساس.
+      </p>
+      <p>
+        نوفر أدوات جراحية من ماركة Natra — معتمدة CE، ستانلس ستيل Rostfrei،
+        ومفحوصة قبل كل شحنة. وإذا كان بيها أي خلل، التبديل متوفر بلا نقاش.
+      </p>
+      <p>
+        هدفنا على المدى البعيد أن نكون موزع مرخص لكبرى شركات الأدوات الطبية —
+        ونحقق هذا الهدف بنفس الطريقة اللي نكسب فيها ثقة كل زبون: بالثبات، مو
+        بالطرق المختصرة.
+      </p>
+      <p>هدفنا مو أرخص سعر. هدفنا نكون المورد اللي ما تحتاج تفكر بيه مرتين.</p>
+    </div>
+
+    <div data-t="ku" class="body-ar" lang="ku" dir="rtl">
+      <h2 class="h">دەربارەی SHM</h2>
+      <p>
+        SHM (Surgical Health Medical Supply) لە ساڵی 2021 دامەزراوە بە یەک
+        ئامانج: دابینکردنی ئامرازی نەشتەرگەری بۆ پزیشکان کە بێ دوودڵی پشتی پێ
+        ببەستن.
+      </p>
+      <p>
+        من خوێندکاری پزیشکیم، و ئەمە وردەکارییەکی لاوەکی نییە — هۆکاری بوونی
+        SHM ـە. تێدەگەم چی پێویستە بۆ نەشتەرگەر لە ئامرازەکانی، چونکە خۆم
+        ئامادەم دەبم ببم بە یەکێک لەوان. هەموو بەرهەمێک کە دابینی دەکەین بەم
+        ستانداردە هەڵدەبژێردرێت و پشکنین دەکرێت.
+      </p>
+      <p>
+        ئێمە ئامرازی نەشتەرگەری ماركەی Natra دابین دەکەین — بە نیشانی CE،
+        پۆڵای بۆننەگیر Rostfrei، پشکنراو پێش هەموو ناردنێک. ئەگەر شتێک ڕاست
+        نەبوو، دەیگۆڕینەوە. بێ ناکۆکی، بێ بیانوو.
+      </p>
+      <p>
+        ئامانجی درێژخایەنمان ئەوەیە ببین بە دابینکەری بەڕەسمی بۆ گەورەترین
+        کۆمپانیاکانی بەرهەمهێنانی ئامرازی پزیشکی — ئەم پێگەیە بەدەست دەهێنین
+        بە هەمان شێوازی کە متمانەی هەر کڕیارێک بەدەست دەهێنین: بە بەردەوامی،
+        نەک بە ڕێگای کەم بەڵام.
+      </p>
+      <p>
+        ئێمە بەدوای هەرزانترین نرخ ناگەڕێین. ئێمە ئەو دابینکەرەیە دروست
+        دەکەین کە پێویست نییە دووجار بیری لێ بکەیتەوە.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    padding-block: var(--s8);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .h {
+    font-size: var(--fs-2xl);
+    margin-block-end: var(--s5);
+    text-align: start;
+  }
+
+  .body-en,
+  .body-ar {
+    max-width: 68ch;
+  }
+  .body-ar {
+    font-family: var(--font-ar);
+  }
+
+  .about p {
+    margin-block-end: var(--s4);
+    font-size: var(--fs-base);
+    line-height: 1.8;
+    color: var(--gray-700);
+    text-align: start;
+  }
+  .about p:last-child {
+    margin-block-end: 0;
+  }
+
+  @media (min-width: 900px) {
+    .h { font-size: var(--fs-3xl); }
+  }
+</style>
