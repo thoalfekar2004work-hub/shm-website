@@ -624,22 +624,28 @@ const jsonLd = {
     transition: opacity 180ms var(--ease), transform 220ms var(--ease);
   }
 
-  .addbtn { width: 100%; }
+  .addbtn {
+    width: 100%;
+    /* Lets the glow ease out smoothly once the animation below is removed
+       (hover/focus/press ends) instead of cutting off instantly. */
+    transition: box-shadow 500ms ease-in-out;
+  }
   .addbtn:hover,
   .addbtn:focus-visible,
   .addbtn:active {
-    animation: addbtn-glow 1.3s ease-in-out infinite;
+    animation: addbtn-glow 2.2s ease-in-out infinite;
   }
   @keyframes addbtn-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgb(50 100 220 / 55%), 0 0 0 0 rgb(50 100 220 / 0%); }
-    50% { box-shadow: 0 0 16px 3px rgb(50 100 220 / 60%), 0 0 30px 10px rgb(50 100 220 / 30%); }
+    0%, 100% { box-shadow: 0 0 0 1px rgb(50 100 220 / 20%), 0 0 10px 1px rgb(50 100 220 / 15%); }
+    50% { box-shadow: 0 0 0 1px rgb(70 120 230 / 40%), 0 0 22px 6px rgb(50 100 220 / 32%); }
   }
   @media (prefers-reduced-motion: reduce) {
+    .addbtn { transition: none; }
     .addbtn:hover,
     .addbtn:focus-visible,
     .addbtn:active {
       animation: none;
-      box-shadow: 0 0 12px 3px rgb(50 100 220 / 45%);
+      box-shadow: 0 0 12px 3px rgb(50 100 220 / 35%);
     }
   }
 

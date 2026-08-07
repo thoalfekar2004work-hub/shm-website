@@ -61,7 +61,7 @@ import { STAR_PATH } from '../lib/review-shared';
 
     const MAX_SCALE = 1.7;
     const SIGMA = 22; // px — how far the influence spreads
-    const SWEEP_MS = 2600; // time to cross the whole row, then loop
+    const SWEEP_MS = 4200; // one full there-and-back cycle
 
     function isFilled(starEl: HTMLElement): boolean {
       const fg = starEl.querySelector<HTMLElement>('.star-fg-wrap');
@@ -92,7 +92,9 @@ import { STAR_PATH } from '../lib/review-shared';
         const lastR = starEls[starEls.length - 1].getBoundingClientRect();
         const minX = firstR.left + firstR.width / 2;
         const maxX = lastR.left + lastR.width / 2;
-        const progress = (t % SWEEP_MS) / SWEEP_MS;
+        // A sine wave (not t % duration) — continuous and self-easing at both
+        // ends, so the sweep glides back and forth with no snap at the loop.
+        const progress = (Math.sin((t / SWEEP_MS) * Math.PI * 2 - Math.PI / 2) + 1) / 2;
         applyAt(minX + progress * (maxX - minX));
       }
       requestAnimationFrame(tick);
@@ -134,7 +136,10 @@ import { STAR_PATH } from '../lib/review-shared';
     width: 18px;
     height: 18px;
     transform-origin: bottom center;
-    transition: transform 140ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    /* No CSS transition here on purpose — the sweep already recomputes
+       transform/filter every animation frame, so a transition on top of
+       that would keep chasing a moving target and read as laggy, not
+       smooth. */
   }
   .rs-star:hover {
     z-index: 1;
@@ -156,11 +161,9 @@ import { STAR_PATH } from '../lib/review-shared';
   .star-fg {
     color: #ffcf4d;
     filter: drop-shadow(0 0 2px rgb(255 200 60 / 45%));
-    transition: filter 140ms cubic-bezier(0.22, 0.61, 0.36, 1);
   }
   @media (prefers-reduced-motion: reduce) {
-    .star-fg { filter: drop-shadow(0 0 3px rgb(255 200 60 / 70%)); transition: none; }
-    .rs-star { transition: none; }
+    .star-fg { filter: drop-shadow(0 0 3px rgb(255 200 60 / 70%)); }
   }
 
   .rs-avg {
