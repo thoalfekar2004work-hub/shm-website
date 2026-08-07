@@ -288,6 +288,11 @@ const labels = {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
+      // GTM: fires once /api/order has confirmed the Telegram send succeeded
+      // — never on click, never on page load, never on a failed submission.
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ event: 'order_submitted' });
+
       // Hand the summary to the success page before the cart is cleared.
       try {
         sessionStorage.setItem(
