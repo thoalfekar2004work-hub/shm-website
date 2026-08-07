@@ -1,0 +1,110 @@
+---
+/**
+ * Thin, display-only rating strip — sits right below the sticky nav, above
+ * the hero. No buttons here on purpose: this is a trust signal a visitor
+ * sees before scrolling, not an entry point to write or read reviews (that
+ * lives in ReviewsSummary further down and on /reviews).
+ */
+import { STAR_PATH } from '../lib/review-shared';
+---
+
+<div class="ratingstrip" data-rating-strip hidden>
+  <div class="rs-stars" aria-hidden="true">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <span class="rs-star" data-star={i}>
+        <svg class="star-bg" viewBox="0 0 24 24" width="18" height="18">
+          <path d={STAR_PATH} fill="currentColor"></path>
+        </svg>
+        <span class="star-fg-wrap">
+          <svg class="star-fg" viewBox="0 0 24 24" width="18" height="18">
+            <path d={STAR_PATH} fill="currentColor"></path>
+          </svg>
+        </span>
+      </span>
+    ))}
+  </div>
+  <span class="rs-avg" data-avg>0.0</span>
+  <span class="rs-count">(<span data-count>0</span>)</span>
+</div>
+
+<script>
+  const strip = document.querySelector<HTMLElement>('[data-rating-strip]');
+  const avgEl = strip?.querySelector('[data-avg]');
+  const countEl = strip?.querySelector('[data-count]');
+  const stars = Array.from(strip?.querySelectorAll<HTMLElement>('.rs-star') ?? []);
+
+  fetch('/api/reviews')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data: { average: number; count: number } | null) => {
+      if (!strip || !data || !data.count) return;
+      if (avgEl) avgEl.textContent = data.average.toFixed(1);
+      if (countEl) countEl.textContent = String(data.count);
+      stars.forEach((starEl, i) => {
+        const fill = Math.max(0, Math.min(1, data.average - i));
+        const fg = starEl.querySelector<HTMLElement>('.star-fg-wrap');
+        if (fg) fg.style.width = `${fill * 100}%`;
+      });
+      strip.hidden = false;
+    })
+    .catch(() => {
+      /* stays hidden — a missing rating strip is not worth surfacing an error for */
+    });
+</script>
+
+<style>
+  .ratingstrip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s2);
+    padding-block: var(--s3);
+    border-block-end: 1px solid var(--border);
+    font-size: var(--fs-sm);
+    background: var(--surface);
+  }
+
+  .rs-stars {
+    display: inline-flex;
+    gap: 2px;
+    direction: ltr;
+  }
+  .rs-star {
+    position: relative;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+  }
+  .rs-star svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  .star-bg {
+    color: var(--gray-200);
+  }
+  .star-fg-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    width: 0%;
+  }
+  .star-fg {
+    color: #ffcf4d;
+    animation: rs-star-glow 2.6s ease-in-out infinite;
+  }
+  @keyframes rs-star-glow {
+    0%, 100% { filter: drop-shadow(0 0 1px rgb(255 200 60 / 50%)); }
+    50% { filter: drop-shadow(0 0 5px rgb(255 200 60 / 90%)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .star-fg { animation: none; filter: drop-shadow(0 0 3px rgb(255 200 60 / 70%)); }
+  }
+
+  .rs-avg {
+    font-weight: 700;
+    color: var(--text);
+  }
+  .rs-count {
+    color: var(--gray-500);
+  }
+</style>
