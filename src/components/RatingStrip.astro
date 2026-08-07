@@ -31,6 +31,7 @@ import { STAR_PATH } from '../lib/review-shared';
   const strip = document.querySelector<HTMLElement>('[data-rating-strip]');
   const avgEl = strip?.querySelector('[data-avg]');
   const countEl = strip?.querySelector('[data-count]');
+  const starRow = strip?.querySelector<HTMLElement>('.rs-stars');
   const stars = Array.from(strip?.querySelectorAll<HTMLElement>('.rs-star') ?? []);
 
   fetch('/api/reviews')
@@ -49,6 +50,31 @@ import { STAR_PATH } from '../lib/review-shared';
     .catch(() => {
       /* stays hidden — a missing rating strip is not worth surfacing an error for */
     });
+
+  // --- dock-style magnify — only the filled (gold) stars respond ------------
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (starRow && !reduceMotion) {
+    const MAX_SCALE = 1.7;
+    const SIGMA = 22; // px — how far the magnify influence spreads
+
+    function isFilled(starEl: HTMLElement): boolean {
+      const fg = starEl.querySelector<HTMLElement>('.star-fg-wrap');
+      return !!fg && parseFloat(fg.style.width) > 0;
+    }
+
+    starRow.addEventListener('mousemove', (e) => {
+      stars.forEach((starEl) => {
+        if (!isFilled(starEl)) return;
+        const r = starEl.getBoundingClientRect();
+        const d = e.clientX - (r.left + r.width / 2);
+        const influence = Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
+        starEl.style.transform = `scale(${(1 + influence * (MAX_SCALE - 1)).toFixed(3)})`;
+      });
+    });
+    starRow.addEventListener('mouseleave', () => {
+      stars.forEach((starEl) => (starEl.style.transform = ''));
+    });
+  }
 </script>
 
 <style>
@@ -65,7 +91,9 @@ import { STAR_PATH } from '../lib/review-shared';
 
   .rs-stars {
     display: inline-flex;
-    gap: 2px;
+    align-items: flex-end;
+    gap: 4px;
+    padding-block-start: 10px;
     direction: ltr;
   }
   .rs-star {
@@ -73,6 +101,11 @@ import { STAR_PATH } from '../lib/review-shared';
     display: inline-block;
     width: 18px;
     height: 18px;
+    transform-origin: bottom center;
+    transition: transform 140ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .rs-star:hover {
+    z-index: 1;
   }
   .rs-star svg {
     position: absolute;
@@ -98,6 +131,7 @@ import { STAR_PATH } from '../lib/review-shared';
   }
   @media (prefers-reduced-motion: reduce) {
     .star-fg { animation: none; filter: drop-shadow(0 0 3px rgb(255 200 60 / 70%)); }
+    .rs-star { transition: none; }
   }
 
   .rs-avg {
