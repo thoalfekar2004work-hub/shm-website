@@ -1,0 +1,407 @@
+---
+import Layout from '../layouts/Layout.astro';
+import T from '../components/T.astro';
+import { t } from '../i18n/strings';
+import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
+---
+
+<Layout
+  titleAr="تقييمات العملاء — SHM"
+  titleEn="Customer Reviews — SHM"
+  titleKu="هەڵسەنگاندنی کڕیاران — SHM"
+  descAr="آراء عملائنا بأدوات Natra الجراحية، وأضف تقييمك."
+  descEn="What customers say about our Natra surgical instruments — and add your own review."
+  descKu="ڕای کڕیارانمان لەبارەی ئامرازی نەشتەرگەری Natra — هەڵسەنگاندنی خۆتیش زیادبکە."
+  canonicalPath="/reviews/">
+  <div class="wrap page">
+    <h1 class="title"><T k="reviews.title" /></h1>
+
+    <div class="aggregate" data-agg-summary hidden>
+      <div class="agg-stars" aria-hidden="true">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <span class="agg-star" data-star={i}>
+            <svg class="star-bg" viewBox="0 0 24 24" width="24" height="24">
+              <path d={STAR_PATH} fill="currentColor"></path>
+            </svg>
+            <span class="star-fg-wrap">
+              <svg class="star-fg" viewBox="0 0 24 24" width="24" height="24">
+                <path d={STAR_PATH} fill="currentColor"></path>
+              </svg>
+            </span>
+          </span>
+        ))}
+      </div>
+      <p class="agg-meta">
+        <span class="agg-avg" data-avg>0.0</span>
+        <span class="agg-count">
+          (<span data-t="ar">{t['reviews.basedOn'].ar}</span><span data-t="en"
+            >{t['reviews.basedOn'].en}</span><span data-t="ku">{t['reviews.basedOn'].ku}</span>
+          {' '}<span data-count>0</span>{' '}
+          <span data-t="ar">{t['reviews.reviewsWord'].ar}</span><span data-t="en"
+            >{t['reviews.reviewsWord'].en}</span><span data-t="ku"
+            >{t['reviews.reviewsWord'].ku}</span>)
+        </span>
+      </p>
+    </div>
+
+    <ul class="rlist" id="review-list"></ul>
+    <p class="rempty" data-list-empty hidden>
+      <span data-t="ar">{t['reviews.noneYet'].ar}</span><span data-t="en"
+        >{t['reviews.noneYet'].en}</span><span data-t="ku">{t['reviews.noneYet'].ku}</span>
+    </p>
+
+    <section class="writebox" id="write" aria-labelledby="write-h">
+      <h2 class="write-h" id="write-h"><T k="reviews.write" /></h2>
+
+      <form id="review-form" novalidate>
+        <div class="field">
+          <label for="r-name"><T k="reviews.formName" /></label>
+          <input id="r-name" name="name" type="text" required maxlength={REVIEW_LIMITS.name}
+            autocomplete="name" enterkeyhint="next" />
+          <p class="err" id="e-name" hidden></p>
+        </div>
+
+        <div class="field">
+          <label id="r-rating-label"><T k="reviews.formRating" /></label>
+          <div class="picker" id="rating-picker" role="radiogroup" aria-labelledby="r-rating-label">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <button
+                type="button"
+                class="pick-star"
+                role="radio"
+                aria-checked="false"
+                data-rating={i + 1}
+                aria-label={`${i + 1}`}>
+                <svg class="star-bg" viewBox="0 0 24 24" width="32" height="32">
+                  <path d={STAR_PATH} fill="currentColor"></path>
+                </svg>
+                <span class="star-fg-wrap">
+                  <svg class="star-fg" viewBox="0 0 24 24" width="32" height="32">
+                    <path d={STAR_PATH} fill="currentColor"></path>
+                  </svg>
+                </span>
+              </button>
+            ))}
+          </div>
+          <input type="hidden" id="r-rating" name="rating" value="" />
+          <p class="err" id="e-rating" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="r-text"><T k="reviews.formText" /></label>
+          <textarea id="r-text" name="text" required rows="4" maxlength={REVIEW_LIMITS.text}
+            data-placeholder-ar={t['reviews.formTextPlaceholder'].ar}
+            data-placeholder-en={t['reviews.formTextPlaceholder'].en}
+            data-placeholder-ku={t['reviews.formTextPlaceholder'].ku}
+            placeholder={t['reviews.formTextPlaceholder'].ar}></textarea>
+          <p class="err" id="e-text" hidden></p>
+        </div>
+
+        {/* Honeypot: hidden from people, tempting to bots. */}
+        <div class="hp" aria-hidden="true">
+          <label for="r-company">Company</label>
+          <input id="r-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <button type="submit" class="btn btn-primary submit" id="review-submit">
+          <T k="reviews.formSubmit" />
+        </button>
+
+        <p class="thanks" id="review-thanks" hidden><T k="reviews.thankYou" /></p>
+        <p class="rerror" id="review-error" hidden><T k="reviews.error" /></p>
+      </form>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { getLang } from '../scripts/i18n';
+  import { t } from '../i18n/strings';
+
+  // --- aggregate + list --------------------------------------------------
+  const aggWrap = document.querySelector<HTMLElement>('[data-agg-summary]');
+  const avgEl = document.querySelector('[data-avg]');
+  const countEl = document.querySelector('[data-count]');
+  const aggStars = Array.from(document.querySelectorAll<HTMLElement>('.agg-star'));
+  const listEl = document.getElementById('review-list');
+  const listEmpty = document.querySelector<HTMLElement>('[data-list-empty]');
+
+  type ApiReview = { name: string; rating: number; text: string; createdAt: string };
+
+  function formatDate(iso: string, lang: 'ar' | 'en' | 'ku'): string {
+    const d = new Date(iso);
+    const locale = lang === 'ar' ? 'ar-IQ' : lang === 'ku' ? 'en-GB' : 'en-US';
+    return d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  function starsMarkup(rating: number): string {
+    let out = '';
+    for (let i = 0; i < 5; i++) {
+      out += i < rating ? '★' : '☆';
+    }
+    return out;
+  }
+
+  fetch('/api/reviews')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data: { reviews: ApiReview[]; average: number; count: number } | null) => {
+      if (!data || !data.count) {
+        if (listEmpty) listEmpty.hidden = false;
+        return;
+      }
+      if (avgEl) avgEl.textContent = data.average.toFixed(1);
+      if (countEl) countEl.textContent = String(data.count);
+      aggStars.forEach((starEl, i) => {
+        const fill = Math.max(0, Math.min(1, data.average - i));
+        const fg = starEl.querySelector<HTMLElement>('.star-fg-wrap');
+        if (fg) fg.style.width = `${fill * 100}%`;
+      });
+      if (aggWrap) aggWrap.hidden = false;
+
+      const lang = getLang();
+      if (listEl) {
+        listEl.innerHTML = '';
+        for (const rev of data.reviews) {
+          const li = document.createElement('li');
+          li.className = 'rline';
+          const safeName = rev.name.replace(/</g, '&lt;');
+          const safeText = rev.text.replace(/</g, '&lt;');
+          li.innerHTML =
+            `<div class="rline-head">` +
+            `<span class="rline-stars" aria-hidden="true">${starsMarkup(rev.rating)}</span>` +
+            `<span class="rline-name">${safeName}</span>` +
+            `<span class="rline-date">${formatDate(rev.createdAt, lang)}</span>` +
+            `</div>` +
+            `<p class="rline-text">${safeText}</p>`;
+          listEl.appendChild(li);
+        }
+      }
+    })
+    .catch(() => {
+      if (listEmpty) listEmpty.hidden = false;
+    });
+
+  // --- rating picker -------------------------------------------------------
+  const ratingInput = document.getElementById('r-rating') as HTMLInputElement | null;
+  const pickStars = Array.from(document.querySelectorAll<HTMLButtonElement>('.pick-star'));
+
+  function paintPicker(rating: number) {
+    pickStars.forEach((btn, i) => {
+      const fg = btn.querySelector<HTMLElement>('.star-fg-wrap');
+      const filled = i < rating;
+      if (fg) fg.style.width = filled ? '100%' : '0%';
+      btn.setAttribute('aria-checked', String(filled));
+    });
+  }
+
+  pickStars.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const rating = Number(btn.dataset.rating);
+      if (ratingInput) ratingInput.value = String(rating);
+      paintPicker(rating);
+    });
+  });
+
+  // --- form submit -----------------------------------------------------------
+  const form = document.getElementById('review-form') as HTMLFormElement | null;
+  const submitBtn = document.getElementById('review-submit') as HTMLButtonElement | null;
+  const thanksEl = document.getElementById('review-thanks');
+  const errorEl = document.getElementById('review-error');
+
+  function showFieldError(id: string, message: string | null) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = message ?? '';
+    el.hidden = !message;
+  }
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!submitBtn) return;
+
+    const lang = getLang();
+    const nameEl = document.getElementById('r-name') as HTMLInputElement;
+    const textEl = document.getElementById('r-text') as HTMLTextAreaElement;
+    const companyEl = document.getElementById('r-company') as HTMLInputElement;
+
+    const name = nameEl.value.trim();
+    const text = textEl.value.trim();
+    const rating = Number(ratingInput?.value || 0);
+
+    let ok = true;
+    showFieldError('e-name', name ? null : t['checkout.required'][lang]);
+    if (!name) ok = false;
+    showFieldError('e-rating', rating >= 1 && rating <= 5 ? null : t['checkout.required'][lang]);
+    if (!(rating >= 1 && rating <= 5)) ok = false;
+    showFieldError('e-text', text ? null : t['checkout.required'][lang]);
+    if (!text) ok = false;
+    if (!ok) return;
+
+    if (thanksEl) thanksEl.hidden = true;
+    if (errorEl) errorEl.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.textContent = t['reviews.formSending'][lang];
+
+    try {
+      const res = await fetch('/api/review', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ name, rating, text, company: companyEl.value }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      form.reset();
+      if (ratingInput) ratingInput.value = '';
+      paintPicker(0);
+      if (thanksEl) thanksEl.hidden = false;
+    } catch {
+      if (errorEl) errorEl.hidden = false;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = t['reviews.formSubmit'][lang];
+    }
+  });
+</script>
+
+<style>
+  .page { padding-block: var(--s7) var(--s8); max-width: 720px; }
+  .title { font-size: var(--fs-3xl); margin-block-end: var(--s6); text-align: start; }
+
+  .aggregate {
+    display: grid;
+    justify-items: start;
+    gap: var(--s2);
+    margin-block-end: var(--s7);
+  }
+  .agg-stars { display: inline-flex; gap: 3px; direction: ltr; }
+  .agg-star { position: relative; display: inline-block; width: 24px; height: 24px; }
+  .agg-star svg { position: absolute; inset: 0; display: block; }
+  .agg-meta { font-size: var(--fs-base); color: var(--gray-700); }
+  .agg-avg { font-weight: 700; font-size: var(--fs-lg); color: var(--text); }
+
+  .star-bg { color: var(--gray-200); }
+  .star-fg-wrap { position: absolute; inset: 0; overflow: hidden; width: 0%; }
+  .star-fg { color: #ffcf4d; }
+
+  .rlist {
+    display: grid;
+    gap: var(--s5);
+    margin-block-end: var(--s7);
+  }
+  .rline {
+    padding-block-end: var(--s5);
+    border-block-end: 1px solid var(--border);
+  }
+  .rline-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s3);
+    text-align: start;
+  }
+  .rline-stars {
+    color: #e0a800;
+    font-size: var(--fs-base);
+    letter-spacing: 1px;
+    direction: ltr;
+  }
+  .rline-name { font-weight: 600; }
+  .rline-date { font-size: var(--fs-xs); color: var(--gray-500); }
+  .rline-text {
+    margin-block-start: var(--s2);
+    color: var(--gray-700);
+    line-height: 1.7;
+    text-align: start;
+  }
+
+  .rempty {
+    color: var(--gray-700);
+    margin-block-end: var(--s7);
+    text-align: start;
+  }
+
+  .writebox {
+    padding-block-start: var(--s6);
+    border-block-start: 1px solid var(--border);
+  }
+  .write-h { font-size: var(--fs-2xl); margin-block-end: var(--s5); text-align: start; }
+
+  .field { margin-block-end: var(--s5); }
+  label {
+    display: block;
+    margin-block-end: var(--s2);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    text-align: start;
+  }
+  input,
+  textarea {
+    width: 100%;
+    padding: var(--s4);
+    font: inherit;
+    font-size: var(--fs-base);
+    color: var(--text);
+    background: var(--surface);
+    border: 1.5px solid var(--border-input);
+    border-radius: var(--radius-sm);
+    min-height: 52px;
+    text-align: start;
+  }
+  textarea { resize: vertical; line-height: 1.6; }
+  input:focus,
+  textarea:focus { border-color: var(--text); }
+
+  .picker {
+    display: inline-flex;
+    gap: 6px;
+    direction: ltr;
+  }
+  .pick-star {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    padding: 2px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .pick-star svg { position: absolute; inset: 2px; display: block; }
+
+  .err {
+    margin-block-start: var(--s2);
+    font-size: var(--fs-sm);
+    color: var(--error);
+    text-align: start;
+  }
+
+  .hp {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .submit { width: 100%; }
+
+  .thanks {
+    margin-block-start: var(--s4);
+    padding: var(--s4);
+    border-radius: var(--radius-sm);
+    background: var(--gray-50);
+    color: var(--text);
+    font-weight: 600;
+    text-align: start;
+  }
+  .rerror {
+    margin-block-start: var(--s4);
+    color: var(--error);
+    font-size: var(--fs-sm);
+    text-align: start;
+  }
+
+  @media (min-width: 560px) {
+    .submit { width: auto; min-width: 220px; }
+  }
+</style>

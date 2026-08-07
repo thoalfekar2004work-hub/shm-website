@@ -193,6 +193,37 @@ export const t: Dict = {
   'footer.rights': { ar: 'كل الحقوق محفوظة', en: 'All rights reserved', ku: 'هەموو مافەکان پارێزراون' },
   'sets.title': { ar: 'الستات', en: 'Sets', ku: 'سێتەکان' },
   'skip.toContent': { ar: 'تخطَّ إلى المحتوى', en: 'Skip to content', ku: 'بازدان بۆ ناوەرۆک' },
+
+  'reviews.title': { ar: 'تقييمات العملاء', en: 'Customer Reviews', ku: 'هەڵسەنگاندنی کڕیاران' },
+  'reviews.seeAll': { ar: 'شاهد التقييمات', en: 'See Reviews', ku: 'هەڵسەنگاندنەکان ببینە' },
+  'reviews.write': { ar: 'أضف تقييمك', en: 'Write a Review', ku: 'هەڵسەنگاندنی خۆت بنووسە' },
+  'reviews.basedOn': { ar: 'بناءً على', en: 'Based on', ku: 'بەپێی' },
+  'reviews.reviewsWord': { ar: 'تقييم', en: 'reviews', ku: 'هەڵسەنگاندن' },
+  'reviews.noneYet': {
+    ar: 'لا توجد تقييمات بعد — كن أول من يضيف تقييمه!',
+    en: 'No reviews yet — be the first!',
+    ku: 'هێشتا هەڵسەنگاندن نییە — یەکەم کەس بە کە!',
+  },
+  'reviews.formName': { ar: 'اسمك', en: 'Your name', ku: 'ناوت' },
+  'reviews.formRating': { ar: 'تقييمك', en: 'Your rating', ku: 'هەڵسەنگاندنی تۆ' },
+  'reviews.formText': { ar: 'رأيك', en: 'Your review', ku: 'ڕای تۆ' },
+  'reviews.formTextPlaceholder': {
+    ar: 'شاركنا تجربتك مع المنتج...',
+    en: 'Tell other customers about your experience...',
+    ku: 'ئەزموونی خۆت لەگەڵ کڕیارانی دیکە باس بکە...',
+  },
+  'reviews.formSubmit': { ar: 'إرسال التقييم', en: 'Submit Review', ku: 'ناردنی هەڵسەنگاندن' },
+  'reviews.formSending': { ar: 'كاعد نرسل...', en: 'Sending...', ku: 'لە ناردندایە...' },
+  'reviews.thankYou': {
+    ar: 'شكراً! تقييمك سيظهر على الموقع بعد المراجعة.',
+    en: "Thanks! Your review will appear once it's approved.",
+    ku: 'سوپاس! هەڵسەنگاندنەکەت دوای پێداچوونەوە لەسەر ماڵپەڕ دەردەکەوێت.',
+  },
+  'reviews.error': {
+    ar: 'صار خلل — جرب مرة ثانية.',
+    en: 'Something went wrong — please try again.',
+    ku: 'هەڵەیەک ڕوویدا — تکایە دووبارە هەوڵ بدەرەوە.',
+  },
 };
 
 export function tr(key: string, lang: Lang): string {

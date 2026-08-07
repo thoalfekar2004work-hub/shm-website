@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Layout from '../layouts/Layout.astro';
 import T from '../components/T.astro';
 import Showcase from '../components/Showcase.astro';
+import ReviewsSummary from '../components/ReviewsSummary.astro';
 import About from '../components/About.astro';
 import {
   categories,
@@ -177,6 +178,8 @@ const HERO_PHOTOS = [
       )}
     </ul>
   </section>
+
+  <ReviewsSummary />
 
   <About />
 </Layout>

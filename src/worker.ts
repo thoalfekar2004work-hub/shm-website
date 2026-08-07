@@ -17,8 +17,15 @@
  * or in case this ever becomes a real Pages project later.
  */
 import { handleOrderRequest, type Env as OrderEnv } from '../functions/api/order';
+import {
+  handleReviewSubmit,
+  handleReviewApprove,
+  handleReviewReject,
+  handleReviewsList,
+  type Env as ReviewEnv,
+} from '../functions/api/review';
 
-interface Env extends OrderEnv {
+interface Env extends OrderEnv, ReviewEnv {
   /** Static-assets binding, configured via [assets] in wrangler.toml. */
   ASSETS: Fetcher;
 }
@@ -26,8 +33,17 @@ interface Env extends OrderEnv {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if (url.pathname === '/api/order') {
-      return handleOrderRequest(request, env);
+    switch (url.pathname) {
+      case '/api/order':
+        return handleOrderRequest(request, env);
+      case '/api/review':
+        return handleReviewSubmit(request, env);
+      case '/api/review/approve':
+        return handleReviewApprove(request, env);
+      case '/api/review/reject':
+        return handleReviewReject(request, env);
+      case '/api/reviews':
+        return handleReviewsList(env);
     }
     return env.ASSETS.fetch(request);
   },

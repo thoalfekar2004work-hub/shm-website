@@ -10,3 +10,8 @@ compatibility_date = "2026-07-01"
 directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "404-page"
+
+# Approved reviews live here — see functions/api/review.ts.
+[[kv_namespaces]]
+binding = "REVIEWS"
+id = "defd9bdbd8c648879d9fc44ca4020bad"

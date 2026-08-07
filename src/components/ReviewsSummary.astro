@@ -1,0 +1,179 @@
+---
+/**
+ * Compact review summary — sits where "Best Sellers" used to be. Renders
+ * empty by default and fills in from GET /api/reviews on the client, since
+ * this is a static build and review counts change without a redeploy.
+ */
+import { t } from '../i18n/strings';
+import { STAR_PATH } from '../lib/review-shared';
+---
+
+<section class="reviewswidget" aria-label="Customer reviews">
+  <div class="wrap">
+    <div class="box">
+      <p class="rw-title">
+        <span data-t="ar" lang="ar" dir="rtl">{t['reviews.title'].ar}</span><span data-t="en"
+          lang="en" dir="ltr">{t['reviews.title'].en}</span><span data-t="ku" lang="ku"
+          dir="rtl">{t['reviews.title'].ku}</span>
+      </p>
+
+      <div class="rw-rating" data-reviews-summary hidden>
+        <div class="rw-stars" aria-hidden="true">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <span class="rw-star" data-star={i}>
+              <svg class="star-bg" viewBox="0 0 24 24" width="30" height="30">
+                <path d={STAR_PATH} fill="currentColor"></path>
+              </svg>
+              <span class="star-fg-wrap">
+                <svg class="star-fg" viewBox="0 0 24 24" width="30" height="30">
+                  <path d={STAR_PATH} fill="currentColor"></path>
+                </svg>
+              </span>
+            </span>
+          ))}
+        </div>
+        <p class="rw-meta">
+          <span class="rw-avg" data-avg>0.0</span>
+          <span class="rw-count">
+            (<span data-t="ar">{t['reviews.basedOn'].ar}</span><span data-t="en"
+              >{t['reviews.basedOn'].en}</span><span data-t="ku">{t['reviews.basedOn'].ku}</span>
+            {' '}<span data-count>0</span>{' '}
+            <span data-t="ar">{t['reviews.reviewsWord'].ar}</span><span data-t="en"
+              >{t['reviews.reviewsWord'].en}</span><span data-t="ku"
+              >{t['reviews.reviewsWord'].ku}</span>)
+          </span>
+        </p>
+      </div>
+
+      <p class="rw-empty" data-reviews-empty hidden>
+        <span data-t="ar">{t['reviews.noneYet'].ar}</span><span data-t="en"
+          >{t['reviews.noneYet'].en}</span><span data-t="ku">{t['reviews.noneYet'].ku}</span>
+      </p>
+
+      <div class="rw-actions">
+        <a class="btn btn-secondary" href="/reviews">
+          <span data-t="ar">{t['reviews.seeAll'].ar}</span><span data-t="en"
+            >{t['reviews.seeAll'].en}</span><span data-t="ku">{t['reviews.seeAll'].ku}</span>
+        </a>
+        <a class="btn btn-primary" href="/reviews#write">
+          <span data-t="ar">{t['reviews.write'].ar}</span><span data-t="en"
+            >{t['reviews.write'].en}</span><span data-t="ku">{t['reviews.write'].ku}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const summary = document.querySelector<HTMLElement>('[data-reviews-summary]');
+  const empty = document.querySelector<HTMLElement>('[data-reviews-empty]');
+  const avgEl = document.querySelector('[data-avg]');
+  const countEl = document.querySelector('[data-count]');
+  const stars = Array.from(document.querySelectorAll<HTMLElement>('.rw-star'));
+
+  fetch('/api/reviews')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data: { average: number; count: number } | null) => {
+      if (!data || !data.count) {
+        if (empty) empty.hidden = false;
+        return;
+      }
+      if (avgEl) avgEl.textContent = data.average.toFixed(1);
+      if (countEl) countEl.textContent = String(data.count);
+      stars.forEach((starEl, i) => {
+        const fill = Math.max(0, Math.min(1, data.average - i));
+        const fg = starEl.querySelector<HTMLElement>('.star-fg-wrap');
+        if (fg) fg.style.width = `${fill * 100}%`;
+      });
+      if (summary) summary.hidden = false;
+    })
+    .catch(() => {
+      if (empty) empty.hidden = false;
+    });
+</script>
+
+<style>
+  .reviewswidget {
+    padding-block: var(--s8);
+    border-block-start: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .box {
+    display: grid;
+    justify-items: center;
+    gap: var(--s4);
+  }
+
+  .rw-title {
+    font-size: var(--fs-xl);
+    font-weight: 700;
+  }
+
+  .rw-rating {
+    display: grid;
+    justify-items: center;
+    gap: var(--s2);
+  }
+
+  .rw-stars {
+    display: inline-flex;
+    gap: 4px;
+    direction: ltr;
+  }
+
+  .rw-star {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+  }
+  .rw-star svg {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  .star-bg {
+    color: var(--gray-200);
+  }
+  .star-fg-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    width: 0%;
+  }
+  .star-fg {
+    color: #ffcf4d;
+    animation: star-glow 2.6s ease-in-out infinite;
+  }
+  @keyframes star-glow {
+    0%, 100% { filter: drop-shadow(0 0 2px rgb(255 200 60 / 55%)); }
+    50% { filter: drop-shadow(0 0 8px rgb(255 200 60 / 95%)); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .star-fg { animation: none; filter: drop-shadow(0 0 4px rgb(255 200 60 / 75%)); }
+  }
+
+  .rw-meta {
+    font-size: var(--fs-base);
+    color: var(--gray-700);
+  }
+  .rw-avg {
+    font-weight: 700;
+    font-size: var(--fs-lg);
+    color: var(--text);
+  }
+
+  .rw-empty {
+    color: var(--gray-700);
+    font-size: var(--fs-base);
+  }
+
+  .rw-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s3);
+    margin-block-start: var(--s2);
+  }
+</style>
