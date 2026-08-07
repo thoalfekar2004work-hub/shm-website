@@ -625,6 +625,23 @@ const jsonLd = {
   }
 
   .addbtn { width: 100%; }
+  .addbtn:hover,
+  .addbtn:focus-visible,
+  .addbtn:active {
+    animation: addbtn-glow 1.3s ease-in-out infinite;
+  }
+  @keyframes addbtn-glow {
+    0%, 100% { box-shadow: 0 0 0 0 rgb(50 100 220 / 55%), 0 0 0 0 rgb(50 100 220 / 0%); }
+    50% { box-shadow: 0 0 16px 3px rgb(50 100 220 / 60%), 0 0 30px 10px rgb(50 100 220 / 30%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .addbtn:hover,
+    .addbtn:focus-visible,
+    .addbtn:active {
+      animation: none;
+      box-shadow: 0 0 12px 3px rgb(50 100 220 / 45%);
+    }
+  }
 
   .stepper {
     display: flex;

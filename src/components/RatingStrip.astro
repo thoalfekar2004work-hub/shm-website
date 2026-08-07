@@ -46,33 +46,65 @@ import { STAR_PATH } from '../lib/review-shared';
         if (fg) fg.style.width = `${fill * 100}%`;
       });
       strip.hidden = false;
+      initGlowSweep(starRow, stars);
     })
     .catch(() => {
       /* stays hidden — a missing rating strip is not worth surfacing an error for */
     });
 
-  // --- dock-style magnify — only the filled (gold) stars respond ------------
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (starRow && !reduceMotion) {
+  // --- moving glow + dock-style magnify — filled (gold) stars only ----------
+  // Runs on its own by default, sweeping star-to-star; a real pointer takes
+  // over while it's in the row and hands control back on mouseleave.
+  function initGlowSweep(row: HTMLElement | null | undefined, starEls: HTMLElement[]) {
+    if (!row || !starEls.length) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const MAX_SCALE = 1.7;
-    const SIGMA = 22; // px — how far the magnify influence spreads
+    const SIGMA = 22; // px — how far the influence spreads
+    const SWEEP_MS = 2600; // time to cross the whole row, then loop
 
     function isFilled(starEl: HTMLElement): boolean {
       const fg = starEl.querySelector<HTMLElement>('.star-fg-wrap');
       return !!fg && parseFloat(fg.style.width) > 0;
     }
 
-    starRow.addEventListener('mousemove', (e) => {
-      stars.forEach((starEl) => {
-        if (!isFilled(starEl)) return;
+    function applyAt(x: number) {
+      starEls.forEach((starEl) => {
+        if (!isFilled(starEl)) {
+          starEl.style.transform = '';
+          starEl.style.filter = '';
+          return;
+        }
         const r = starEl.getBoundingClientRect();
-        const d = e.clientX - (r.left + r.width / 2);
+        const d = x - (r.left + r.width / 2);
         const influence = Math.exp(-(d * d) / (2 * SIGMA * SIGMA));
         starEl.style.transform = `scale(${(1 + influence * (MAX_SCALE - 1)).toFixed(3)})`;
+        starEl.style.filter =
+          `drop-shadow(0 0 ${(2 + influence * 7).toFixed(1)}px rgb(255 200 60 / ${(0.45 + influence * 0.5).toFixed(2)}))`;
       });
+    }
+
+    let hovering = false;
+
+    function tick(t: number) {
+      if (!hovering) {
+        const firstR = starEls[0].getBoundingClientRect();
+        const lastR = starEls[starEls.length - 1].getBoundingClientRect();
+        const minX = firstR.left + firstR.width / 2;
+        const maxX = lastR.left + lastR.width / 2;
+        const progress = (t % SWEEP_MS) / SWEEP_MS;
+        applyAt(minX + progress * (maxX - minX));
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    row.addEventListener('mousemove', (e) => {
+      hovering = true;
+      applyAt(e.clientX);
     });
-    starRow.addEventListener('mouseleave', () => {
-      stars.forEach((starEl) => (starEl.style.transform = ''));
+    row.addEventListener('mouseleave', () => {
+      hovering = false;
     });
   }
 </script>
@@ -123,14 +155,11 @@ import { STAR_PATH } from '../lib/review-shared';
   }
   .star-fg {
     color: #ffcf4d;
-    animation: rs-star-glow 2.6s ease-in-out infinite;
-  }
-  @keyframes rs-star-glow {
-    0%, 100% { filter: drop-shadow(0 0 1px rgb(255 200 60 / 50%)); }
-    50% { filter: drop-shadow(0 0 5px rgb(255 200 60 / 90%)); }
+    filter: drop-shadow(0 0 2px rgb(255 200 60 / 45%));
+    transition: filter 140ms cubic-bezier(0.22, 0.61, 0.36, 1);
   }
   @media (prefers-reduced-motion: reduce) {
-    .star-fg { animation: none; filter: drop-shadow(0 0 3px rgb(255 200 60 / 70%)); }
+    .star-fg { filter: drop-shadow(0 0 3px rgb(255 200 60 / 70%)); transition: none; }
     .rs-star { transition: none; }
   }
 
