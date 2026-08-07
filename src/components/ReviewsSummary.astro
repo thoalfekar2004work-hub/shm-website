@@ -67,8 +67,11 @@ import { STAR_PATH } from '../lib/review-shared';
 <script>
   const summary = document.querySelector<HTMLElement>('[data-reviews-summary]');
   const empty = document.querySelector<HTMLElement>('[data-reviews-empty]');
-  const avgEl = document.querySelector('[data-avg]');
-  const countEl = document.querySelector('[data-count]');
+  // Scoped to `summary`, not `document` — the homepage also has RatingStrip's
+  // own [data-avg]/[data-count] elements, and an unscoped query would grab
+  // whichever one happens to come first in the DOM.
+  const avgEl = summary?.querySelector('[data-avg]');
+  const countEl = summary?.querySelector('[data-count]');
   const stars = Array.from(document.querySelectorAll<HTMLElement>('.rw-star'));
 
   fetch('/api/reviews')

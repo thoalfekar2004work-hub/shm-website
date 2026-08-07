@@ -120,8 +120,11 @@ import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
 
   // --- aggregate + list --------------------------------------------------
   const aggWrap = document.querySelector<HTMLElement>('[data-agg-summary]');
-  const avgEl = document.querySelector('[data-avg]');
-  const countEl = document.querySelector('[data-count]');
+  // Scoped to `aggWrap` — [data-avg]/[data-count] aren't unique attribute
+  // names across the site's review components, so an unscoped query is one
+  // stray element away from grabbing the wrong one.
+  const avgEl = aggWrap?.querySelector('[data-avg]');
+  const countEl = aggWrap?.querySelector('[data-count]');
   const aggStars = Array.from(document.querySelectorAll<HTMLElement>('.agg-star'));
   const listEl = document.getElementById('review-list');
   const listEmpty = document.querySelector<HTMLElement>('[data-list-empty]');
