@@ -44,7 +44,7 @@ interface PublicReview {
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json; charset=utf-8' },
+    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
   });
 
 /** Plain confirmation page — this is what opens when the owner taps a Telegram link. */
@@ -66,7 +66,12 @@ function confirmPage(message: string): string {
 }
 
 function htmlResponse(body: string, status = 200): Response {
-  return new Response(body, { status, headers: { 'content-type': 'text/html; charset=utf-8' } });
+  return new Response(body, {
+    status,
+    // Never let a browser, proxy, or Cloudflare's edge cache reuse a stale
+    // response for a moderation link — each tap has to hit the Worker fresh.
+    headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' },
+  });
 }
 
 async function sendTelegramReviewNotice(env: Env, record: ReviewRecord): Promise<void> {
