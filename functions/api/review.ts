@@ -74,6 +74,16 @@ function htmlResponse(body: string, status = 200): Response {
   });
 }
 
+/**
+ * Approve/Reject used to be plain "text: url" lines and relied on Telegram's
+ * own auto-link detection to make them tappable. That broke at least twice
+ * in a row, both times right after a message with RTL Arabic review text —
+ * a long auto-detected link sitting next to bidi text is a known source of
+ * corrupted tap targets in chat clients (text can visually wrap or reorder
+ * in ways that don't match the underlying href). Real inline-keyboard
+ * buttons sidestep all of that: the URL is button metadata, never rendered
+ * or parsed as text, so there's nothing for wrapping or bidi to break.
+ */
 async function sendTelegramReviewNotice(env: Env, record: ReviewRecord): Promise<void> {
   const base = env.TELEGRAM_API_BASE || 'https://api.telegram.org';
   const site = env.SITE_URL || 'https://shm-website.thoalfekar2004work.workers.dev';
@@ -88,9 +98,6 @@ async function sendTelegramReviewNotice(env: Env, record: ReviewRecord): Promise
     stars,
     '',
     record.text,
-    '',
-    `✅ Approve: ${approveUrl}`,
-    `❌ Reject: ${rejectUrl}`,
   ].join('\n');
 
   const res = await fetch(`${base}/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -100,6 +107,14 @@ async function sendTelegramReviewNotice(env: Env, record: ReviewRecord): Promise
       chat_id: env.TELEGRAM_CHAT_ID,
       text: message,
       disable_web_page_preview: true,
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '✅ Approve', url: approveUrl },
+            { text: '❌ Reject', url: rejectUrl },
+          ],
+        ],
+      },
     }),
   });
   if (!res.ok) {
