@@ -10,6 +10,15 @@ compatibility_date = "2026-07-01"
 directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "404-page"
+# Without this, Cloudflare's static-asset layer can intercept /api/* before
+# the Worker's fetch() ever runs — and once it decides a path "doesn't exist"
+# (e.g. during any transient hiccup), that negative result can get cached at
+# the edge independently of this code, per edge node, with no cache-control
+# header of ours able to prevent it (that header only applies to responses
+# the Worker itself returns). This forces every request through fetch() in
+# src/worker.ts first, always, so /api/review/approve and /reject can never
+# be served by anything other than the real routing logic below.
+run_worker_first = ["/api/*"]
 
 # Approved reviews live here — see functions/api/review.ts.
 [[kv_namespaces]]
