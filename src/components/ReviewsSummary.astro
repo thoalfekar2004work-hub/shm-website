@@ -88,6 +88,11 @@ import { STAR_PATH } from '../lib/review-shared';
         const fill = Math.max(0, Math.min(1, data.average - i));
         const fg = starEl.querySelector<HTMLElement>('.star-fg-wrap');
         if (fg) fg.style.width = `${fill * 100}%`;
+        // A star that's neither fully lit nor fully dark gets a soft feathered
+        // edge instead of a hard vertical cut — a straight clip through a
+        // 5-point star shape reads as the star being sliced/dragged, not
+        // a fade, especially once the sweep below starts scaling it.
+        starEl.classList.toggle('is-partial', fill > 0 && fill < 1);
       });
       if (summary) summary.hidden = false;
       initGlowSweep(starRow, stars);
@@ -214,6 +219,12 @@ import { STAR_PATH } from '../lib/review-shared';
     inset: 0;
     overflow: hidden;
     width: 0%;
+    transition: width 450ms ease-out;
+  }
+  /* Feathered edge, partial stars only — full/empty stars stay crisp. */
+  .rw-star.is-partial .star-fg-wrap {
+    -webkit-mask-image: linear-gradient(to right, #000 0%, #000 calc(100% - 10px), transparent 100%);
+    mask-image: linear-gradient(to right, #000 0%, #000 calc(100% - 10px), transparent 100%);
   }
   .star-fg {
     color: #ffcf4d;
@@ -221,6 +232,7 @@ import { STAR_PATH } from '../lib/review-shared';
   }
   @media (prefers-reduced-motion: reduce) {
     .star-fg { filter: drop-shadow(0 0 4px rgb(255 200 60 / 75%)); }
+    .star-fg-wrap { transition: none; }
   }
 
   .rw-meta {
