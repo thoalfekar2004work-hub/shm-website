@@ -4,6 +4,7 @@ import Layout from '../../layouts/Layout.astro';
 import T from '../../components/T.astro';
 import Price from '../../components/Price.astro';
 import Countdown from '../../components/Countdown.astro';
+import ProductReviewSnippet from '../../components/ProductReviewSnippet.astro';
 import {
   products,
   imagesFor,
@@ -161,6 +162,8 @@ const jsonLd = {
             ))}
           </ul>
         )}
+
+        <ProductReviewSnippet />
       </section>
 
       <!-- 2..8 Detail column -->

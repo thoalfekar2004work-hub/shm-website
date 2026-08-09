@@ -1,0 +1,131 @@
+---
+/**
+ * A single, randomly-picked approved review — shown under the product photo
+ * gallery as social proof. Rendered hidden and filled in client-side (same
+ * pattern as the rest of the review widgets): this is a static build, so
+ * there's no way to know at build time which reviews exist or pick a random
+ * one server-side without it being frozen at build time forever.
+ */
+import { t } from '../i18n/strings';
+---
+
+<div class="reviewsnippet" data-review-snippet hidden>
+  <p class="rs-label">
+    <span data-t="ar" lang="ar" dir="rtl">{t['reviews.whatCustomersSay'].ar}</span><span
+      data-t="en" lang="en" dir="ltr">{t['reviews.whatCustomersSay'].en}</span><span data-t="ku"
+      lang="ku" dir="rtl">{t['reviews.whatCustomersSay'].ku}</span>
+  </p>
+  <div class="rs-head">
+    <div class="rs-stars" aria-hidden="true" data-snippet-stars></div>
+    <span class="rs-name" data-snippet-name></span>
+    <span class="rs-verified" data-snippet-verified hidden>
+      ✅ <span data-t="ar">{t['reviews.verifiedPurchase'].ar}</span><span data-t="en"
+        >{t['reviews.verifiedPurchase'].en}</span><span data-t="ku"
+        >{t['reviews.verifiedPurchase'].ku}</span>
+    </span>
+  </div>
+  <p class="rs-text" data-snippet-text></p>
+</div>
+
+<script>
+  import { STAR_PATH } from '../lib/review-shared';
+
+  type ApiReview = {
+    name: string;
+    rating: number;
+    text: string;
+    createdAt: string;
+    verifiedPurchase?: boolean;
+  };
+
+  const box = document.querySelector<HTMLElement>('[data-review-snippet]');
+  if (box) {
+    fetch('/api/reviews')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { reviews: ApiReview[] } | null) => {
+        if (!data || !data.reviews.length) return;
+        const rev = data.reviews[Math.floor(Math.random() * data.reviews.length)];
+
+        const starsEl = box.querySelector('[data-snippet-stars]');
+        if (starsEl) {
+          let html = '';
+          for (let i = 0; i < 5; i++) {
+            const color = i < rev.rating ? '#ffcf4d' : 'var(--gray-200)';
+            html +=
+              `<svg viewBox="0 0 24 24" width="14" height="14" style="color:${color}">` +
+              `<path d="${STAR_PATH}" fill="currentColor"></path></svg>`;
+          }
+          starsEl.innerHTML = html;
+        }
+
+        const nameEl = box.querySelector('[data-snippet-name]');
+        if (nameEl) nameEl.textContent = rev.name;
+
+        const textEl = box.querySelector('[data-snippet-text]');
+        if (textEl) textEl.textContent = rev.text;
+
+        const verifiedEl = box.querySelector<HTMLElement>('[data-snippet-verified]');
+        if (verifiedEl) verifiedEl.hidden = !rev.verifiedPurchase;
+
+        box.hidden = false;
+      })
+      .catch(() => {
+        /* stays hidden — one missing testimonial isn't worth surfacing an error for */
+      });
+  }
+</script>
+
+<style>
+  .reviewsnippet {
+    margin-block-start: var(--s5);
+    padding: var(--s4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--gray-50);
+  }
+
+  .rs-label {
+    font-size: var(--fs-xs);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    margin-block-end: var(--s2);
+    text-align: start;
+  }
+
+  .rs-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s2);
+    text-align: start;
+  }
+  .rs-stars {
+    display: inline-flex;
+    gap: 1px;
+    direction: ltr;
+  }
+  .rs-stars svg { display: block; }
+  .rs-name { font-weight: 600; font-size: var(--fs-sm); }
+  .rs-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px var(--s2);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--gray-700);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .rs-text {
+    margin-block-start: var(--s2);
+    font-size: var(--fs-sm);
+    color: var(--gray-700);
+    line-height: 1.6;
+    text-align: start;
+  }
+</style>

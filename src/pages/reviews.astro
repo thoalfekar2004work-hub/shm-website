@@ -117,6 +117,7 @@ import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
 <script>
   import { getLang } from '../scripts/i18n';
   import { t } from '../i18n/strings';
+  import { STAR_PATH } from '../lib/review-shared';
 
   // --- aggregate + list --------------------------------------------------
   const aggWrap = document.querySelector<HTMLElement>('[data-agg-summary]');
@@ -129,7 +130,13 @@ import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
   const listEl = document.getElementById('review-list');
   const listEmpty = document.querySelector<HTMLElement>('[data-list-empty]');
 
-  type ApiReview = { name: string; rating: number; text: string; createdAt: string };
+  type ApiReview = {
+    name: string;
+    rating: number;
+    text: string;
+    createdAt: string;
+    verifiedPurchase?: boolean;
+  };
 
   function formatDate(iso: string, lang: 'ar' | 'en' | 'ku'): string {
     const d = new Date(iso);
@@ -137,10 +144,17 @@ import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
     return d.toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' });
   }
 
+  // Real SVG stars, not the ★/☆ text glyphs the old version used — some
+  // platforms render those with their own built-in color regardless of what
+  // CSS says, which is why "gold" stars didn't always look gold. An SVG path
+  // with fill="currentColor" has no such escape hatch.
   function starsMarkup(rating: number): string {
     let out = '';
     for (let i = 0; i < 5; i++) {
-      out += i < rating ? '★' : '☆';
+      const color = i < rating ? '#ffcf4d' : 'var(--gray-200)';
+      out +=
+        `<svg class="rline-star" viewBox="0 0 24 24" width="16" height="16" style="color:${color}">` +
+        `<path d="${STAR_PATH}" fill="currentColor"></path></svg>`;
     }
     return out;
   }
@@ -170,10 +184,14 @@ import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
           li.className = 'rline';
           const safeName = rev.name.replace(/</g, '&lt;');
           const safeText = rev.text.replace(/</g, '&lt;');
+          const verifiedBadge = rev.verifiedPurchase
+            ? `<span class="rline-verified">✅ ${t['reviews.verifiedPurchase'][lang]}</span>`
+            : '';
           li.innerHTML =
             `<div class="rline-head">` +
             `<span class="rline-stars" aria-hidden="true">${starsMarkup(rev.rating)}</span>` +
             `<span class="rline-name">${safeName}</span>` +
+            verifiedBadge +
             `<span class="rline-date">${formatDate(rev.createdAt, lang)}</span>` +
             `</div>` +
             `<p class="rline-text">${safeText}</p>`;
@@ -300,37 +318,6 @@ import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
     .star-fg-wrap { transition: none; }
   }
 
-  .rlist {
-    display: grid;
-    gap: var(--s5);
-    margin-block-end: var(--s7);
-  }
-  .rline {
-    padding-block-end: var(--s5);
-    border-block-end: 1px solid var(--border);
-  }
-  .rline-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--s3);
-    text-align: start;
-  }
-  .rline-stars {
-    color: #e0a800;
-    font-size: var(--fs-base);
-    letter-spacing: 1px;
-    direction: ltr;
-  }
-  .rline-name { font-weight: 600; }
-  .rline-date { font-size: var(--fs-xs); color: var(--gray-500); }
-  .rline-text {
-    margin-block-start: var(--s2);
-    color: var(--gray-700);
-    line-height: 1.7;
-    text-align: start;
-  }
-
   .rempty {
     color: var(--gray-700);
     margin-block-end: var(--s7);
@@ -421,5 +408,65 @@ import { REVIEW_LIMITS, STAR_PATH } from '../lib/review-shared';
 
   @media (min-width: 560px) {
     .submit { width: auto; min-width: 220px; }
+  }
+</style>
+
+<style is:global>
+  /*
+   * These review cards are built entirely client-side (innerHTML on a
+   * document.createElement'd <li>), so they never receive Astro's
+   * data-astro-cid-* scoping attribute — scoped rules silently never match
+   * them. Kept in their own is:global block, scoped by class name only, so
+   * the rest of this page's same-named-elsewhere classes (.picker, .field,
+   * .err, .submit, etc.) stay component-scoped as before.
+   */
+  .rlist {
+    display: grid;
+    gap: var(--s4);
+    margin-block-end: var(--s7);
+  }
+  .rline {
+    padding: var(--s5);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .rline-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s3);
+    text-align: start;
+  }
+  .rline-stars {
+    display: inline-flex;
+    gap: 1px;
+    direction: ltr;
+  }
+  .rline-star { display: block; }
+  .rline-name { font-weight: 600; }
+  .rline-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px var(--s2);
+    border-radius: 999px;
+    background: var(--gray-50);
+    color: var(--gray-700);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .rline-date {
+    font-size: var(--fs-xs);
+    color: var(--gray-500);
+    margin-inline-start: auto;
+  }
+  .rline-text {
+    margin-block-start: var(--s3);
+    color: var(--gray-700);
+    line-height: 1.7;
+    text-align: start;
   }
 </style>

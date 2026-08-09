@@ -224,6 +224,16 @@ export const t: Dict = {
     en: 'Something went wrong — please try again.',
     ku: 'هەڵەیەک ڕوویدا — تکایە دووبارە هەوڵ بدەرەوە.',
   },
+  'reviews.verifiedPurchase': {
+    ar: 'عملية شراء موثّقة',
+    en: 'Verified Purchase',
+    ku: 'کڕینی پشتڕاستکراوە',
+  },
+  'reviews.whatCustomersSay': {
+    ar: 'شنو يقول عملاؤنا',
+    en: 'What Customers Say',
+    ku: 'کڕیارانمان چی دەڵێن',
+  },
 
   'promo.freeDeliveryBanner': {
     ar: 'توصيل مجاني على جميع الطلبات',

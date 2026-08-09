@@ -29,9 +29,11 @@ interface ReviewRecord {
   rating: number;
   text: string;
   status: 'pending' | 'approved' | 'rejected';
-  /** Guards the approve/reject links — without it, a guessed id could moderate someone else's review. */
+  /** Guards the approve/reject/verify links — without it, a guessed id could moderate someone else's review. */
   token: string;
   createdAt: string;
+  /** Set by the owner via the Telegram "Verified Purchase" button — independent of approve/reject. */
+  verifiedPurchase?: boolean;
 }
 
 interface PublicReview {
@@ -39,6 +41,7 @@ interface PublicReview {
   rating: number;
   text: string;
   createdAt: string;
+  verifiedPurchase?: boolean;
 }
 
 const json = (body: unknown, status = 200) =>
@@ -89,6 +92,7 @@ async function sendTelegramReviewNotice(env: Env, record: ReviewRecord): Promise
   const site = env.SITE_URL || 'https://shm-website.thoalfekar2004work.workers.dev';
   const approveUrl = `${site}/api/review/approve?id=${record.id}&token=${record.token}`;
   const rejectUrl = `${site}/api/review/reject?id=${record.id}&token=${record.token}`;
+  const verifyUrl = `${site}/api/review/verify?id=${record.id}&token=${record.token}`;
   const stars = '⭐'.repeat(record.rating) + '☆'.repeat(5 - record.rating);
 
   const message = [
@@ -113,6 +117,7 @@ async function sendTelegramReviewNotice(env: Env, record: ReviewRecord): Promise
             { text: '✅ Approve', url: approveUrl },
             { text: '❌ Reject', url: rejectUrl },
           ],
+          [{ text: '🏅 Mark Verified Purchase', url: verifyUrl }],
         ],
       },
     }),
@@ -229,6 +234,42 @@ export function handleReviewReject(request: Request, env: Env): Promise<Response
   return moderateReview(request, env, 'rejected');
 }
 
+/**
+ * GET /api/review/verify?id=&token= — tapped from the Telegram message.
+ * Independent of approve/reject: the owner can mark a review as a verified
+ * purchase whenever they're sure of it, regardless of moderation status.
+ * The badge only actually shows once the review is also approved.
+ */
+export async function handleReviewVerify(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  const id = url.searchParams.get('id') ?? '';
+  const token = url.searchParams.get('token') ?? '';
+
+  if (!id || !token) return htmlResponse(confirmPage('Missing link parameters.'), 400);
+  if (!env.REVIEWS) return htmlResponse(confirmPage('Storage is not configured.'), 500);
+
+  const raw = await env.REVIEWS.get(`review:${id}`);
+  if (!raw) {
+    return htmlResponse(confirmPage('Review not found — it may have already been deleted.'), 404);
+  }
+
+  const record = JSON.parse(raw) as ReviewRecord;
+  if (record.token !== token) {
+    return htmlResponse(confirmPage('Invalid or expired link.'), 403);
+  }
+
+  if (record.verifiedPurchase) {
+    return htmlResponse(confirmPage(`Already marked as a verified purchase — no action taken.`));
+  }
+
+  record.verifiedPurchase = true;
+  await env.REVIEWS.put(`review:${id}`, JSON.stringify(record));
+
+  return htmlResponse(
+    confirmPage(`Review by ${record.name} marked as a verified purchase 🏅.`),
+  );
+}
+
 /** GET /api/reviews — public, approved reviews only, newest first. */
 export async function handleReviewsList(env: Env): Promise<Response> {
   if (!env.REVIEWS) return json({ reviews: [], average: 0, count: 0 });
@@ -247,6 +288,7 @@ export async function handleReviewsList(env: Env): Promise<Response> {
           rating: record.rating,
           text: record.text,
           createdAt: record.createdAt,
+          verifiedPurchase: record.verifiedPurchase,
         });
       }
     }

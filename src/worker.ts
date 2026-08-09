@@ -21,6 +21,7 @@ import {
   handleReviewSubmit,
   handleReviewApprove,
   handleReviewReject,
+  handleReviewVerify,
   handleReviewsList,
   type Env as ReviewEnv,
 } from '../functions/api/review';
@@ -42,6 +43,8 @@ export default {
         return handleReviewApprove(request, env);
       case '/api/review/reject':
         return handleReviewReject(request, env);
+      case '/api/review/verify':
+        return handleReviewVerify(request, env);
       case '/api/reviews':
         return handleReviewsList(env);
     }
