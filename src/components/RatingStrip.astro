@@ -78,6 +78,7 @@ import { STAR_PATH } from '../lib/review-shared';
         if (!isFilled(starEl)) {
           starEl.style.transform = '';
           starEl.style.filter = '';
+          starEl.style.zIndex = '';
           return;
         }
         const r = starEl.getBoundingClientRect();
@@ -86,6 +87,10 @@ import { STAR_PATH } from '../lib/review-shared';
         starEl.style.transform = `scale(${(1 + influence * (MAX_SCALE - 1)).toFixed(3)})`;
         starEl.style.filter =
           `drop-shadow(0 0 ${(2 + influence * 7).toFixed(1)}px rgb(255 200 60 / ${(0.45 + influence * 0.5).toFixed(2)}))`;
+        // Growing past its own box means it needs to paint above its
+        // neighbors too, or the enlarged star reads as clipped/"cut off"
+        // by the smaller stars sitting next to it in default paint order.
+        starEl.style.zIndex = influence > 0.02 ? '2' : '';
       });
     }
 
