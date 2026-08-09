@@ -56,13 +56,27 @@ const onOffer = promoActive(product);
     ) : (
       <p class="pricerow">
         <Price product={product} />
-        {product.is_set && (
+        {product.is_set ? (
           <span class="freedelivery"><T k="product.freeDelivery" /></span>
+        ) : (
+          <span class="freedelivery" data-free-delivery-promo hidden>
+            <T k="product.freeDelivery" />
+          </span>
         )}
       </p>
     )}
   </div>
 </a>
+
+<script>
+  import { freeDeliveryPromoActive } from '../lib/order-shared';
+
+  if (freeDeliveryPromoActive()) {
+    document
+      .querySelectorAll<HTMLElement>('[data-free-delivery-promo]')
+      .forEach((el) => (el.hidden = false));
+  }
+</script>
 
 <style>
   .card {

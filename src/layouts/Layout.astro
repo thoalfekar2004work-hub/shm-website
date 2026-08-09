@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import PromoBanner from '../components/PromoBanner.astro';
 import { SITE_URL } from '../i18n/strings';
 
 interface Props {
@@ -150,6 +151,7 @@ const ogImageUrl = ogImage ? new URL(ogImage, SITE_URL).href : new URL('/og-defa
       <span data-t="ar">تخطَّ إلى المحتوى</span><span data-t="en">Skip to content</span><span
         data-t="ku">بازدان بۆ ناوەرۆک</span>
     </a>
+    <PromoBanner />
     <Nav />
     <main id="main">
       <slot />

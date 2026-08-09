@@ -197,8 +197,12 @@ const jsonLd = {
         ) : (
           <p class="bigprice">
             <Price product={p} />
-            {p.is_set && (
+            {p.is_set ? (
               <span class="freedelivery"><T k="product.freeDelivery" /></span>
+            ) : (
+              <span class="freedelivery" data-free-delivery-promo hidden>
+                <T k="product.freeDelivery" />
+              </span>
             )}
           </p>
         )}
@@ -291,7 +295,14 @@ const jsonLd = {
               <T k="product.viewCart" /> →
             </a>
             <span class="deliv">
-              <T k={p.is_set ? 'cart.deliveryNoteFree' : 'cart.deliveryNote'} />
+              {p.is_set ? (
+                <T k="cart.deliveryNoteFree" />
+              ) : (
+                <>
+                  <span data-free-delivery-promo hidden><T k="cart.deliveryNoteFree" /></span>
+                  <span data-free-delivery-normal><T k="cart.deliveryNote" /></span>
+                </>
+              )}
             </span>
           </p>
         )}
@@ -336,6 +347,17 @@ const jsonLd = {
 
 <script>
   import { addToCart, setQty, qtyOf } from '../../scripts/cart';
+  import { freeDeliveryPromoActive } from '../../lib/order-shared';
+
+  // --- free-delivery promo ---------------------------------------------------
+  if (freeDeliveryPromoActive()) {
+    document
+      .querySelectorAll<HTMLElement>('[data-free-delivery-promo]')
+      .forEach((el) => (el.hidden = false));
+    document
+      .querySelectorAll<HTMLElement>('[data-free-delivery-normal]')
+      .forEach((el) => (el.hidden = true));
+  }
 
   // --- gallery -------------------------------------------------------------
   const main = document.getElementById('main-image') as HTMLImageElement | null;

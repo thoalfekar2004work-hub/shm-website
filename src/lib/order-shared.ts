@@ -19,12 +19,28 @@ export const LIMITS = {
 export const DELIVERY_FEE_IQD = 5000;
 
 /**
+ * Site-wide free-delivery promo — every order ships free while this is
+ * active, not just sets. It expires on its own the instant this timestamp
+ * passes (checked live, both server-side and in the browser) — no manual
+ * revert needed. To end it early, just set this to a past date; to run
+ * another one later, move it forward again.
+ */
+export const FREE_DELIVERY_PROMO_ENDS = '2026-08-11T23:59:59+03:00';
+
+export function freeDeliveryPromoActive(now: Date = new Date()): boolean {
+  return now.getTime() < Date.parse(FREE_DELIVERY_PROMO_ENDS);
+}
+
+/**
  * Delivery is free when the order includes any set — the set's own page
- * advertises this, so checkout has to actually honor it. One free-delivery
- * item in a mixed cart waives the flat fee for the whole order rather than
- * trying to prorate a charge that was never itemized per line.
+ * advertises this, so checkout has to actually honor it — or, temporarily,
+ * for every order while the site-wide promo above is running. One
+ * free-delivery item in a mixed cart waives the flat fee for the whole
+ * order rather than trying to prorate a charge that was never itemized
+ * per line.
  */
 export function deliveryFeeFor(items: { is_set?: boolean }[]): number {
+  if (freeDeliveryPromoActive()) return 0;
   return items.some((it) => it.is_set) ? 0 : DELIVERY_FEE_IQD;
 }
 

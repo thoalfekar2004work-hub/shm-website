@@ -1,0 +1,62 @@
+---
+/**
+ * Site-wide free-delivery announcement bar. Rendered hidden in the static
+ * HTML and revealed by the client script below only while the promo end
+ * date (order-shared.ts) is still in the future — so a page that's been
+ * open or cached past the deadline never shows a promo that's actually over.
+ */
+import { FREE_DELIVERY_PROMO_ENDS } from '../lib/order-shared';
+import { t } from '../i18n/strings';
+---
+
+<div class="promobanner" data-promo-banner data-promo-ends={FREE_DELIVERY_PROMO_ENDS} hidden>
+  <p class="wrap">
+    <span aria-hidden="true">🚚</span>
+    <span data-t="ar" lang="ar" dir="rtl">{t['promo.freeDeliveryBanner'].ar}</span><span data-t="en"
+      lang="en" dir="ltr">{t['promo.freeDeliveryBanner'].en}</span><span data-t="ku" lang="ku"
+      dir="rtl">{t['promo.freeDeliveryBanner'].ku}</span>
+    <span class="pb-sep" aria-hidden="true">·</span>
+    <span data-t="ar">{t['promo.through'].ar}</span><span data-t="en"
+      >{t['promo.through'].en}</span><span data-t="ku">{t['promo.through'].ku}</span>
+    {' '}<span data-promo-until></span>
+  </p>
+</div>
+
+<script>
+  import { getLang } from '../scripts/i18n';
+
+  const banner = document.querySelector<HTMLElement>('[data-promo-banner]');
+  if (banner) {
+    const endMs = Date.parse(banner.dataset.promoEnds ?? '');
+    if (Number.isFinite(endMs) && Date.now() < endMs) {
+      const untilEl = banner.querySelector('[data-promo-until]');
+      if (untilEl) {
+        const lang = getLang();
+        const locale = lang === 'ar' ? 'ar-IQ' : lang === 'ku' ? 'en-GB' : 'en-US';
+        untilEl.textContent = new Date(endMs).toLocaleDateString(locale, {
+          month: 'short',
+          day: 'numeric',
+          timeZone: 'Asia/Baghdad',
+        });
+      }
+      banner.hidden = false;
+    }
+  }
+</script>
+
+<style>
+  .promobanner {
+    background: var(--navy);
+    color: var(--white);
+  }
+  .promobanner .wrap {
+    padding-block: var(--s2);
+    text-align: center;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+  }
+  .pb-sep {
+    margin-inline: var(--s2);
+    opacity: 0.55;
+  }
+</style>

@@ -224,6 +224,13 @@ export const t: Dict = {
     en: 'Something went wrong — please try again.',
     ku: 'هەڵەیەک ڕوویدا — تکایە دووبارە هەوڵ بدەرەوە.',
   },
+
+  'promo.freeDeliveryBanner': {
+    ar: 'توصيل مجاني على جميع الطلبات',
+    en: 'Free delivery on every order',
+    ku: 'گەیاندنی بەخۆڕایی بۆ هەموو داواکارییەک',
+  },
+  'promo.through': { ar: 'لغاية', en: 'through', ku: 'تا' },
 };
 
 export function tr(key: string, lang: Lang): string {
